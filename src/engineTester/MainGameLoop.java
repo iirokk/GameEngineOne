@@ -14,20 +14,21 @@ import textures.ModelTexture;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainGameLoop {
+
+	public static float randomFloat(Random random) {
+		int min = 0;
+		int max = 100;
+		return min + random.nextFloat() * (max - min);
+	}
 
 	public static void main(String[] args) {
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
 
-		RawModel model = OBJLoader.loadObjModel("dragon", loader);
-		TexturedModel texturedModel = new TexturedModel(model,
-				new ModelTexture(loader.loadTexture("stallTexture")));
-		ModelTexture texture = texturedModel.getTexture();
-		texture.setShineDamper(5);
-		texture.setReflectivity(0.1f);
-		texture.setHasTransparency(false);
+		List<Entity> entities = new ArrayList<>();
 
 		RawModel model1 = OBJLoader.loadObjModel("fern", loader);
 		TexturedModel texturedModel1 = new TexturedModel(model1,
@@ -36,16 +37,16 @@ public class MainGameLoop {
 		texture1.setShineDamper(5);
 		texture1.setReflectivity(0.1f);
 		texture1.setHasTransparency(true);
-		texture1.setUseFakeLighting(true);
 
-		List<Entity> entities = new ArrayList<Entity>();
-		entities.add(new Entity(texturedModel, new Vector3f(0,0,-25), 0,0,0,1));
-		entities.add(new Entity(texturedModel1, new Vector3f(10,0,25), 0,0,0,1));
+		Random random = new Random();
+		for (int i = 0; i < 50; i++) {
+			entities.add(new Entity(texturedModel1, new Vector3f(randomFloat(random), 0,randomFloat(random)), 0,randomFloat(random),0,1));
+		}
 
 		Terrain terrain = new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("ground_tex")));
 		Terrain terrain2 = new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("ground_tex")));
 
-		Light light = new Light(new Vector3f(0,0,-20), new Vector3f(1,1,1));
+		Light light = new Light(new Vector3f(0,100,-20), new Vector3f(1,1,1));
 
 		Camera camera = new Camera();
 
