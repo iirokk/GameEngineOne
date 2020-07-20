@@ -20,7 +20,7 @@ public class MainGameLoop {
 
 	public static float randomFloat(Random random) {
 		int min = 0;
-		int max = 100;
+		int max = 250;
 		return min + random.nextFloat() * (max - min);
 	}
 
@@ -39,7 +39,7 @@ public class MainGameLoop {
 		texture1.setHasTransparency(true);
 
 		Random random = new Random();
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 100; i++) {
 			entities.add(new Entity(texturedModel1, new Vector3f(randomFloat(random), 0,randomFloat(random)), 0,randomFloat(random),0,1));
 		}
 
