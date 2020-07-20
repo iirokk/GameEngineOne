@@ -4,6 +4,8 @@ import entities.Camera;
 import entities.Entity;
 import entities.Light;
 import models.TexturedModel;
+import objConverter.ModelData;
+import objConverter.OBJFileLoader;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 import renderEngine.*;
@@ -30,7 +32,9 @@ public class MainGameLoop {
 
 		List<Entity> entities = new ArrayList<>();
 
-		RawModel model1 = OBJLoader.loadObjModel("fern", loader);
+		ModelData modelData = OBJFileLoader.loadOBJ("fern");
+		RawModel model1 = loader.loadToVAO(modelData.getVertices(), modelData.getTextureCoords(), modelData.getNormals(),
+				modelData.getIndices());
 		TexturedModel texturedModel1 = new TexturedModel(model1,
 				new ModelTexture(loader.loadTexture("fern")));
 		ModelTexture texture1 = texturedModel1.getTexture();
