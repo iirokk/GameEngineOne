@@ -12,7 +12,8 @@ public class Camera {
     private float roll;
 
     public Camera() {
-        yaw = 180;
+        this.yaw = 180;
+        this.position.y = 1;
     }
 
     public void move() {
