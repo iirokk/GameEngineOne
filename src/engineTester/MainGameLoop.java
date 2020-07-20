@@ -9,6 +9,7 @@ import org.lwjgl.util.vector.Vector3f;
 import renderEngine.*;
 import models.RawModel;
 import shaders.StaticShader;
+import terrain.Terrain;
 import textures.ModelTexture;
 
 import java.util.ArrayList;
@@ -28,6 +29,10 @@ public class MainGameLoop {
 		texture.setReflectivity(0.1f);
 		List<Entity> entities = new ArrayList<Entity>();
 		entities.add(new Entity(texturedModel, new Vector3f(0,0,-25), 0,0,0,1));
+
+		Terrain terrain = new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("stallTexture")));
+		Terrain terrain2 = new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("black_leather")));
+
 		Light light = new Light(new Vector3f(0,0,-20), new Vector3f(1,1,1));
 
 		Camera camera = new Camera();
@@ -43,6 +48,9 @@ public class MainGameLoop {
 			for (Entity entity:entities) {
 				renderer.processEntity(entity);
 			}
+			renderer.processTerrain(terrain);
+			renderer.processTerrain(terrain2);
+
 			renderer.render(light, camera);
 			
 			DisplayManager.updateDisplay();
