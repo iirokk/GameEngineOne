@@ -14,7 +14,7 @@ public class Camera {
     private Player player;
     private float distanceFromPlayer = 50;
     private float angleAroundPlayer = 50;
-    private float playerHeightOffset = 6;
+    private final float playerHeightOffset = 6;
 
     public Camera(Player player) {
         this.player = player;
