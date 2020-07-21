@@ -3,6 +3,7 @@ package engineTester;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
+import entities.Player;
 import models.TexturedModel;
 import objConverter.ModelData;
 import objConverter.OBJFileLoader;
@@ -61,14 +62,20 @@ public class MainGameLoop {
 		Terrain terrain = new Terrain(0, 0, loader, texturePack, blendMap);
 		Terrain terrain2 = new Terrain(1, 1, loader, texturePack, blendMap);
 
+		// Player
+		ModelData playerModel = OBJFileLoader.loadOBJ("person");
+		RawModel playerRawModel = loader.loadToVAO(playerModel.getVertices(), playerModel.getTextureCoords(),
+				playerModel.getNormals(), playerModel.getIndices());
+		TexturedModel playerTexturedModel = new TexturedModel(playerRawModel, new ModelTexture(loader.loadTexture("playerTexture")));
+		Player player = new Player(playerTexturedModel, new Vector3f(100, 0, -50), 0, 0, 0, 1);
+
 		Light light = new Light(new Vector3f(0,100,-20), new Vector3f(1,1,1));
-
-		Camera camera = new Camera();
-
+		Camera camera = new Camera(player);
 		MasterRenderer renderer = new MasterRenderer();
 
 		while (!Display.isCloseRequested()) {
 			camera.move();
+			player.move();
 			
 			// game logic
 			
@@ -80,7 +87,8 @@ public class MainGameLoop {
 			renderer.processTerrain(terrain2);
 
 			renderer.render(light, camera);
-			
+			renderer.processEntity(player);
+
 			DisplayManager.updateDisplay();
 		}
 
