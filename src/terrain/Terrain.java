@@ -17,12 +17,14 @@ import java.io.File;
 import java.io.IOException;
 
 public class Terrain {
-    private static final float SIZE = 800;
+    public static final float SIZE = 800;
     private static final float MAX_HEIGHT = 40;
     private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 
     private float x;
     private float z;
+    private int gridX;
+    private int gridZ;
     private RawModel model;
     private TerrainTexturePack texturePack;
     private TerrainTexture blendMap;
@@ -35,6 +37,8 @@ public class Terrain {
         this.x = gridX * SIZE;
         this.z = gridZ * SIZE;
         this.model = generateTerrain(loader, heightMap);
+        this.gridX = gridX;
+        this.gridZ = gridZ;
     }
 
     public float getX() {
@@ -43,6 +47,14 @@ public class Terrain {
 
     public float getZ() {
         return z;
+    }
+
+    public int getGridX() {
+        return gridX;
+    }
+
+    public int getGridZ() {
+        return gridZ;
     }
 
     public RawModel getModel() {

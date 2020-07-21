@@ -13,6 +13,7 @@ import renderEngine.*;
 import models.RawModel;
 import shaders.StaticShader;
 import terrain.Terrain;
+import terrain.TerrainMap;
 import textures.ModelTexture;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
@@ -34,14 +35,17 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 
 		// Terrain
+		TerrainMap terrainMap = new TerrainMap();
 		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("grassy2"));
 		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("mud"));
 		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("grassFlowers"));
 		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("ground_tex"));
 		TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
 		TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
-
-		Terrain terrain = new Terrain(0, 0, loader, texturePack, blendMap, "heightmap");
+		terrainMap.addTerrain(new Terrain(0, 0, loader, texturePack, blendMap, "heightmap"));
+		terrainMap.addTerrain(new Terrain(0, -1, loader, texturePack, blendMap, "heightmap"));
+		terrainMap.addTerrain(new Terrain(-1, 0, loader, texturePack, blendMap, "heightmap"));
+		terrainMap.addTerrain(new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap"));
 
 		// creating entities list
 		List<Entity> entities = new ArrayList<>();
@@ -58,10 +62,10 @@ public class MainGameLoop {
 		texture1.setNumberOfRows(2);
 
 		Random random = new Random();
-		for (int i = 0; i < 200; i++) {
-			float xPos = randomFloat(random);
-			float zPos = randomFloat(random);
-			float yPos = terrain.getHeightOfTerrain(xPos, zPos);
+		for (int i = 0; i < 500; i++) {
+			float xPos = randomFloat(random) - 200;
+			float zPos = randomFloat(random) - 200;
+			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
 			entities.add(new Entity(texturedModel1, random.nextInt(4), new Vector3f(xPos, yPos, zPos),
 					0, randomFloat(random),0,1));
 		}
@@ -79,7 +83,7 @@ public class MainGameLoop {
 
 		while (!Display.isCloseRequested()) {
 			camera.move();
-			player.move(terrain);
+			player.move(terrainMap);
 			
 			// game logic
 			
@@ -87,9 +91,9 @@ public class MainGameLoop {
 			for (Entity entity:entities) {
 				renderer.processEntity(entity);
 			}
-			renderer.processTerrain(terrain);
-			//renderer.processTerrain(terrain2);
-
+			for (Terrain terrain:terrainMap.getAllTerrains()) {
+				renderer.processTerrain(terrain);
+			}
 			renderer.render(light, camera);
 			renderer.processEntity(player);
 

@@ -5,6 +5,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 import renderEngine.DisplayManager;
 import terrain.Terrain;
+import terrain.TerrainMap;
 
 public class Player extends Entity {
 
@@ -22,7 +23,7 @@ public class Player extends Entity {
         super(model, position, rotX, rotY, rotZ, scale);
     }
 
-    public void move(Terrain terrain) {
+    public void move(TerrainMap terrainMap) {
         checkInputs();
         super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
         float distance = currentSpeed * DisplayManager.getFrameTimeSeconds();
@@ -32,7 +33,7 @@ public class Player extends Entity {
         upwardSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds();
         super.increasePosition(dx, upwardSpeed * DisplayManager.getFrameTimeSeconds(), dz);
 
-        float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
+        float terrainHeight = terrainMap.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
         if(super.getPosition().y < terrainHeight) {
             upwardSpeed = 0;
             super.getPosition().y = terrainHeight;
