@@ -4,10 +4,13 @@ import entities.Camera;
 import entities.Entity;
 import entities.Light;
 import entities.Player;
+import guis.GuiRenderer;
+import guis.GuiTexture;
 import models.TexturedModel;
 import objConverter.ModelData;
 import objConverter.OBJFileLoader;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import renderEngine.*;
 import models.RawModel;
@@ -71,15 +74,25 @@ public class MainGameLoop {
 		}
 
 		// Player
-		ModelData playerModel = OBJFileLoader.loadOBJ("person");
+		ModelData playerModel = OBJFileLoader.loadOBJ("gameModels/mammoth");
 		RawModel playerRawModel = loader.loadToVAO(playerModel.getVertices(), playerModel.getTextureCoords(),
 				playerModel.getNormals(), playerModel.getIndices());
-		TexturedModel playerTexturedModel = new TexturedModel(playerRawModel, new ModelTexture(loader.loadTexture("playerTexture")));
-		Player player = new Player(playerTexturedModel, new Vector3f(100, 0, -50), 0, 0, 0, 1);
+		TexturedModel playerTexturedModel = new TexturedModel(playerRawModel, new ModelTexture(loader.loadTexture("black_leather")));
+		Player player = new Player(playerTexturedModel, new Vector3f(100, 0, -50), 0, 0, 0, 4);
 
 		Light light = new Light(new Vector3f(0,100,-20), new Vector3f(1,1,1));
 		Camera camera = new Camera(player);
 		MasterRenderer renderer = new MasterRenderer();
+
+		// GUI
+		List<GuiTexture> guis = new ArrayList<>();
+		GuiTexture guiCompass = new GuiTexture(loader.loadTexture("gui/compass"), new Vector2f(0f, -0.85f), new Vector2f(0.25f, 0.05f));
+		guis.add(guiCompass);
+		GuiTexture guiCompassPointer = new GuiTexture(loader.loadTexture("gui/loc_indicator"), new Vector2f(0.1f, -0.85f), new Vector2f(0.02f, 0.03f));
+		guis.add(guiCompassPointer);
+		GuiTexture guiHealth = new GuiTexture(loader.loadTexture("gui/health_indicator"), new Vector2f(0f, -0.92f), new Vector2f(0.25f, 0.01f));
+		guis.add(guiHealth);
+		GuiRenderer guiRenderer = new GuiRenderer(loader);
 
 		while (!Display.isCloseRequested()) {
 			camera.move();
@@ -97,9 +110,11 @@ public class MainGameLoop {
 			renderer.render(light, camera);
 			renderer.processEntity(player);
 
+			guiRenderer.render(guis);
+
 			DisplayManager.updateDisplay();
 		}
-
+		guiRenderer.cleanUp();
 		renderer.cleanUp();
 		loader.cleanUp();
 		DisplayManager.closeDisplay();
