@@ -1,0 +1,8 @@
+Remember to select .obj export
+
+Under geometry
+- apply modifiers
+- write normals
+- include UV's
+- write materials
+- triangulate faces !

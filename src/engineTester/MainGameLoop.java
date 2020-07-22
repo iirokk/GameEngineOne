@@ -14,7 +14,6 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import renderEngine.*;
 import models.RawModel;
-import shaders.StaticShader;
 import terrain.Terrain;
 import terrain.TerrainMap;
 import textures.ModelTexture;
@@ -32,6 +31,14 @@ public class MainGameLoop {
 		int max = 400;
 		return min + random.nextFloat() * (max - min);
 	}
+
+	public static float randomFloat(Random random, int min_value, int max_value) {
+		int min = min_value;
+		int max = max_value;
+		return min + random.nextFloat() * (max - min);
+	}
+
+
 
 	public static void main(String[] args) {
 		DisplayManager.createDisplay();
@@ -64,6 +71,15 @@ public class MainGameLoop {
 		texture1.setHasTransparency(true);
 		texture1.setNumberOfRows(2);
 
+		ModelData modelData2 = OBJFileLoader.loadOBJ("gameModels/dead_tree");
+		RawModel model2 = loader.loadToVAO(modelData2.getVertices(), modelData2.getTextureCoords(), modelData2.getNormals(),
+				modelData2.getIndices());
+		TexturedModel texturedModel2 = new TexturedModel(model2,
+				new ModelTexture(loader.loadTexture("ground_tex")));
+		ModelTexture texture2 = texturedModel2.getTexture();
+		texture2.setShineDamper(5);
+		texture2.setReflectivity(0.1f);
+
 		Random random = new Random();
 		for (int i = 0; i < 500; i++) {
 			float xPos = randomFloat(random) - 200;
@@ -71,6 +87,13 @@ public class MainGameLoop {
 			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
 			entities.add(new Entity(texturedModel1, random.nextInt(4), new Vector3f(xPos, yPos, zPos),
 					0, randomFloat(random),0,1));
+		}
+		for (int i = 0; i < 100; i++) {
+			float xPos = randomFloat(random, -800, 800);
+			float zPos = randomFloat(random, -800, 800);
+			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
+			entities.add(new Entity(texturedModel2, new Vector3f(xPos, yPos, zPos),
+					0, randomFloat(random),0,20));
 		}
 
 		// Player
