@@ -33,9 +33,7 @@ public class MainGameLoop {
 	}
 
 	public static float randomFloat(Random random, int min_value, int max_value) {
-		int min = min_value;
-		int max = max_value;
-		return min + random.nextFloat() * (max - min);
+		return min_value + random.nextFloat() * (max_value - min_value);
 	}
 
 	public static void main(String[] args) {
@@ -84,14 +82,14 @@ public class MainGameLoop {
 			float zPos = randomFloat(random) - 200;
 			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
 			entities.add(new Entity(texturedModel1, random.nextInt(4), new Vector3f(xPos, yPos, zPos),
-					0, randomFloat(random),0,1));
+					0, randomFloat(random),0,0.5f));
 		}
 		for (int i = 0; i < 100; i++) {
 			float xPos = randomFloat(random, -800, 800);
 			float zPos = randomFloat(random, -800, 800);
 			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
 			entities.add(new Entity(texturedModel2, new Vector3f(xPos, yPos, zPos),
-					0, randomFloat(random),0,20));
+					0, randomFloat(random),0,7));
 		}
 
 		// Player
@@ -99,7 +97,7 @@ public class MainGameLoop {
 		RawModel playerRawModel = loader.loadToVAO(playerModel.getVertices(), playerModel.getTextureCoords(),
 				playerModel.getNormals(), playerModel.getIndices());
 		TexturedModel playerTexturedModel = new TexturedModel(playerRawModel, new ModelTexture(loader.loadTexture("black_leather")));
-		Player player = new Player(playerTexturedModel, new Vector3f(100, 0, -50), 0, 0, 0, 4);
+		Player player = new Player(playerTexturedModel, new Vector3f(100, 0, -50), 0, 0, 0, 2);
 
 		Camera camera = new Camera(player);
 
@@ -121,7 +119,7 @@ public class MainGameLoop {
 		guis.add(guiHealth);
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 
-		MasterRenderer renderer = new MasterRenderer();
+		MasterRenderer renderer = new MasterRenderer(loader);
 
 		while (!Display.isCloseRequested()) {
 			camera.move();
