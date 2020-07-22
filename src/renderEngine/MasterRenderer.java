@@ -22,9 +22,16 @@ public class MasterRenderer {
     private static final float FOV = 70;
     private static final float NEAR_PLANE = 0.1f;
     private static final float FAR_PLANE = 1000;  // also modify sky box size accordingly
-    private static final float SKY_RED = 0.42f;
-    private static final float SKY_GREEN = 0.56f;
-    private static final float SKY_BLUE = 0.65f;
+    private static float SKY_RED;
+    private static float SKY_GREEN;
+    private static float SKY_BLUE;
+
+    private static final float nightSkyRed = 0.01f;
+    private static final float nightSkyGreen = 0.03f;
+    private static final float nightSkyBlue = 0.03f;
+    private static final float daySkyRed = 0.48f;
+    private static final float daySkyGreen = 0.61f;
+    private static final float daySkyBlue = 0.70f;
 
     private Matrix4f projectionMatrix;
     private StaticShader shader = new StaticShader();
@@ -44,7 +51,10 @@ public class MasterRenderer {
         skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
     }
 
-    public void render(List<Light> lights, Camera camera){
+    public void render(List<Light> lights, Camera camera, float timeOfDay){
+        float dayNightBlendFactor = calculateBlendFactor(timeOfDay);
+        calculateSkyColor(dayNightBlendFactor);
+
         prepare();
         shader.start();
         shader.loadSkyColor(SKY_RED, SKY_GREEN, SKY_BLUE);
@@ -58,7 +68,7 @@ public class MasterRenderer {
         terrainShader.loadViewMatrix(camera);
         terrainRenderer.render(terrains);
         terrainShader.stop();
-        skyboxRenderer.render(camera);
+        skyboxRenderer.render(camera, SKY_RED, SKY_GREEN, SKY_BLUE, dayNightBlendFactor);
         terrains.clear();
         entities.clear();
     }
@@ -112,5 +122,25 @@ public class MasterRenderer {
     public void cleanUp(){
         shader.cleanUp();
         terrainShader.cleanUp();
+    }
+
+    private float calculateBlendFactor(float timeOfDay) {
+        if (timeOfDay < 3) {
+            return 1f;  // full night
+        } else if (timeOfDay > 6 && timeOfDay < 21){
+            return 0f; // full day
+        } else if (timeOfDay >= 3 && timeOfDay <= 6) {
+            return 1- (timeOfDay - 3) / 3; // morning
+        } else if (timeOfDay >= 21) {
+            return (timeOfDay - 21) / 3; // evening
+        } else {
+            return 0f;
+        }
+    }
+
+    private static void calculateSkyColor(float dayNightBlendFactor) {
+        SKY_RED = nightSkyRed * dayNightBlendFactor + (1 - dayNightBlendFactor) * daySkyRed;
+        SKY_GREEN = nightSkyGreen * dayNightBlendFactor + (1 - dayNightBlendFactor) * daySkyGreen;
+        SKY_BLUE = nightSkyBlue * dayNightBlendFactor + (1 - dayNightBlendFactor) * daySkyBlue;
     }
 }

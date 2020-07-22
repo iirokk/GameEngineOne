@@ -121,7 +121,12 @@ public class MainGameLoop {
 
 		MasterRenderer renderer = new MasterRenderer(loader);
 
+		float timeOfDay = 13.60f;
 		while (!Display.isCloseRequested()) {
+			timeOfDay += 0.001;
+			if (timeOfDay >= 24) {
+				timeOfDay = 0f;
+			}
 			camera.move();
 			player.move(terrainMap);
 			
@@ -134,7 +139,7 @@ public class MainGameLoop {
 			for (Terrain terrain:terrainMap.getAllTerrains()) {
 				renderer.processTerrain(terrain);
 			}
-			renderer.render(lightSources, camera);
+			renderer.render(lightSources, camera, timeOfDay);
 			renderer.processEntity(player);
 
 			guiRenderer.render(guis);
