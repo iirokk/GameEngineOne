@@ -105,10 +105,11 @@ public class MainGameLoop {
 
 		// Light
 		List<Light> lightSources = new ArrayList<>();
-		Light sun = new Light(new Vector3f(0,300,-1000), new Vector3f(1,1,1));
+		Light sun = new Light(new Vector3f(0,1000,-1000), new Vector3f(1.2f, 1.2f,1.2f));
 		lightSources.add(sun);
-		Light otherLight = new Light(new Vector3f(0,11,0), new Vector3f(2,1.6f,1.0f));
-		lightSources.add(otherLight);
+		Light campFire = new Light(new Vector3f(5,10,0), new Vector3f(2.6f,2.0f,1.3f),
+				new Vector3f(1,0.001f,0.001f));
+		lightSources.add(campFire);
 
 		// GUI
 		List<GuiTexture> guis = new ArrayList<>();
