@@ -38,8 +38,6 @@ public class MainGameLoop {
 		return min + random.nextFloat() * (max - min);
 	}
 
-
-
 	public static void main(String[] args) {
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
@@ -103,9 +101,14 @@ public class MainGameLoop {
 		TexturedModel playerTexturedModel = new TexturedModel(playerRawModel, new ModelTexture(loader.loadTexture("black_leather")));
 		Player player = new Player(playerTexturedModel, new Vector3f(100, 0, -50), 0, 0, 0, 4);
 
-		Light light = new Light(new Vector3f(0,100,-20), new Vector3f(1,1,1));
 		Camera camera = new Camera(player);
-		MasterRenderer renderer = new MasterRenderer();
+
+		// Light
+		List<Light> lightSources = new ArrayList<>();
+		Light sun = new Light(new Vector3f(0,300,-1000), new Vector3f(1,1,1));
+		lightSources.add(sun);
+		Light otherLight = new Light(new Vector3f(0,11,0), new Vector3f(2,1.6f,1.0f));
+		lightSources.add(otherLight);
 
 		// GUI
 		List<GuiTexture> guis = new ArrayList<>();
@@ -116,6 +119,8 @@ public class MainGameLoop {
 		GuiTexture guiHealth = new GuiTexture(loader.loadTexture("gui/health_indicator"), new Vector2f(0f, -0.92f), new Vector2f(0.25f, 0.01f));
 		guis.add(guiHealth);
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
+
+		MasterRenderer renderer = new MasterRenderer();
 
 		while (!Display.isCloseRequested()) {
 			camera.move();
@@ -130,7 +135,7 @@ public class MainGameLoop {
 			for (Terrain terrain:terrainMap.getAllTerrains()) {
 				renderer.processTerrain(terrain);
 			}
-			renderer.render(light, camera);
+			renderer.render(lightSources, camera);
 			renderer.processEntity(player);
 
 			guiRenderer.render(guis);

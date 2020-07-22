@@ -41,17 +41,17 @@ public class MasterRenderer {
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
     }
 
-    public void render(Light sun, Camera camera){
+    public void render(List<Light> lights, Camera camera){
         prepare();
         shader.start();
         shader.loadSkyColor(SKY_RED, SKY_GREEN, SKY_BLUE);
-        shader.loadLight(sun);
+        shader.loadLights(lights);
         shader.loadViewMatrix(camera);
         entityRenderer.render(entities);
         shader.stop();
         terrainShader.start();
         terrainShader.loadSkyColor(SKY_RED, SKY_GREEN, SKY_BLUE);
-        terrainShader.loadLight(sun);
+        terrainShader.loadLights(lights);
         terrainShader.loadViewMatrix(camera);
         terrainRenderer.render(terrains);
         terrainShader.stop();
