@@ -7,6 +7,7 @@ import models.TexturedModel;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector4f;
 import shaders.StaticShader;
 import shaders.TerrainShader;
 import skybox.SkyboxRenderer;
@@ -53,26 +54,28 @@ public class MasterRenderer {
     }
 
     public void renderScene(List<Entity> entities, TerrainMap terrainMap, List<Light> lightSources, Camera camera,
-                            float dayNightBlendFactor) {
+                            float dayNightBlendFactor, Vector4f clippingPlane) {
         for (Entity entity:entities) {
             processEntity(entity);
         }
         for (Terrain terrain:terrainMap.getAllTerrains()) {
             processTerrain(terrain);
         }
-        render(lightSources, camera, dayNightBlendFactor);
+        render(lightSources, camera, dayNightBlendFactor, clippingPlane);
     }
 
-    public void render(List<Light> lights, Camera camera, float dayNightBlendFactor){
+    public void render(List<Light> lights, Camera camera, float dayNightBlendFactor, Vector4f clippingPlane){
         calculateSkyColor(dayNightBlendFactor);
         prepare();
         shader.start();
+        shader.loadClippingPlane(clippingPlane);
         shader.loadSkyColor(SKY_RED, SKY_GREEN, SKY_BLUE);
         shader.loadLights(lights);
         shader.loadViewMatrix(camera);
         entityRenderer.render(entities);
         shader.stop();
         terrainShader.start();
+        terrainShader.loadClippingPlane(clippingPlane);
         terrainShader.loadSkyColor(SKY_RED, SKY_GREEN, SKY_BLUE);
         terrainShader.loadLights(lights);
         terrainShader.loadViewMatrix(camera);

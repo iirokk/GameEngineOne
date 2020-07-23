@@ -10,8 +10,11 @@ import models.TexturedModel;
 import objConverter.ModelData;
 import objConverter.OBJFileLoader;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 import renderEngine.*;
 import models.RawModel;
 import terrain.Terrain;
@@ -66,7 +69,7 @@ public class MainGameLoop {
 		WaterRenderer waterRenderer = new WaterRenderer(loader,waterShader, renderer.getProjectionMatrix());
 		List<WaterTile> waterTiles = new ArrayList<>();
 		waterTiles.add(new WaterTile(175, -175, -1.5f));
-		WaterFrameBuffers fbos = new WaterFrameBuffers();
+		WaterFrameBuffers frameBuffers = new WaterFrameBuffers();
 
 		// creating entities list
 		List<Entity> entities = new ArrayList<>();
@@ -141,8 +144,10 @@ public class MainGameLoop {
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
 
-		GuiTexture gui = new GuiTexture(fbos.getReflectionTexture(), new Vector2f(-0.5f, 0.5f), new Vector2f(0.5f, 0.5f));
-		guiTextures.add(gui);
+		GuiTexture refraction = new GuiTexture(frameBuffers.getRefractionTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
+		GuiTexture reflection = new GuiTexture(frameBuffers.getReflectionTexture(), new Vector2f(-0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
+		guiTextures.add(refraction);
+		guiTextures.add(reflection);
 
 		float timeOfDay = 12.60f;
 		while (!Display.isCloseRequested()) {
@@ -164,16 +169,32 @@ public class MainGameLoop {
 			// game logic
 
 			// render
-			fbos.bindReflectionFrameBuffer();
-			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor);
-			fbos.unbindCurrentFrameBuffer();
+			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 
-			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor);
+			// render reflection
+			frameBuffers.bindReflectionFrameBuffer();
+			float cameraReflectionDistance = 2 * (camera.getPosition().y - waterTiles.get(0).getHeight());
+			camera.getPosition().y -= cameraReflectionDistance;
+			camera.invertPitch();
+			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
+					new Vector4f(0, 1, 0, -waterTiles.get(0).getHeight()));
+			camera.getPosition().y += cameraReflectionDistance;
+			camera.invertPitch();
+
+			// render refraction
+			frameBuffers.bindRefractionFrameBuffer();
+			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
+					new Vector4f(0, -1, 0, waterTiles.get(0).getHeight()));
+
+			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
+			frameBuffers.unbindCurrentFrameBuffer();
+			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
+					new Vector4f(0, 0, 0, 0));
 			waterRenderer.render(waterTiles, camera);
 			guiRenderer.render(guiTextures);
 			DisplayManager.updateDisplay();
 		}
-		fbos.cleanUp();
+		frameBuffers.cleanUp();
 		waterShader.cleanUp();
 		guiRenderer.cleanUp();
 		renderer.cleanUp();

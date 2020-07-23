@@ -18,8 +18,13 @@ uniform vec3 lightPosition[4];
 const float fogDensity = 0.0025;
 const float fogGradient = 6.0;
 
+uniform vec4 clippingPlane;
+
 void main(void){
     vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
+
+    gl_ClipDistance[0] = dot(worldPosition, clippingPlane);
+
     vec4 positionRelativeToCam = viewMatrix * worldPosition;
     gl_Position = projectionMatrix * positionRelativeToCam;
     pass_textureCoords = textureCoords;
