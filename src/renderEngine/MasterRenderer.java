@@ -11,6 +11,7 @@ import shaders.StaticShader;
 import shaders.TerrainShader;
 import skybox.SkyboxRenderer;
 import terrain.Terrain;
+import terrain.TerrainMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +50,17 @@ public class MasterRenderer {
         entityRenderer = new EntityRenderer(shader, projectionMatrix);
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
+    }
+
+    public void renderScene(List<Entity> entities, TerrainMap terrainMap, List<Light> lightSources, Camera camera,
+                            float dayNightBlendFactor) {
+        for (Entity entity:entities) {
+            processEntity(entity);
+        }
+        for (Terrain terrain:terrainMap.getAllTerrains()) {
+            processTerrain(terrain);
+        }
+        render(lightSources, camera, dayNightBlendFactor);
     }
 
     public void render(List<Light> lights, Camera camera, float dayNightBlendFactor){

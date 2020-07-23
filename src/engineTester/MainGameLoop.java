@@ -103,7 +103,7 @@ public class MainGameLoop {
 				playerModel.getNormals(), playerModel.getIndices());
 		TexturedModel playerTexturedModel = new TexturedModel(playerRawModel, new ModelTexture(loader.loadTexture("black_leather")));
 		Player player = new Player(playerTexturedModel, new Vector3f(100, 0, -50), 0, 0, 0, 2);
-
+		entities.add(player);
 		Camera camera = new Camera(player, terrainMap);
 
 		// Light
@@ -148,25 +148,13 @@ public class MainGameLoop {
 
 			// game logic
 
-
-			
 			// render
-			for (Entity entity:entities) {
-				renderer.processEntity(entity);
-			}
-			for (Terrain terrain:terrainMap.getAllTerrains()) {
-				renderer.processTerrain(terrain);
-			}
-			renderer.render(lightSources, camera, dayNightBlendFactor);
-			renderer.processEntity(player);
-
+			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor);
 			guiRenderer.render(guis);
-
 			DisplayManager.updateDisplay();
 		}
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
-
 		loader.cleanUp();
 		DisplayManager.closeDisplay();
 	}
