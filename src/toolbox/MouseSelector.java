@@ -17,16 +17,24 @@ public class MouseSelector {
         this.camera = camera;
     }
 
-    public Entity mouseSelectEntity(List<Entity> selectableEntities) {
-
-        // TODO: not implemented
+    public void mouseSelectEntity(List<Entity> selectableEntities) {
+        // loop through entity list and select nearest entity colliding with mousePicker ray
         Vector3f currentRay = mousePicker.getCurrentRay();
-        float distanceToCenter = getObjectCollisionDistance(currentRay, new Vector3f(0, 0, 0), 2);
-        if (distanceToCenter < RAY_RANGE) {
-            System.out.println(distanceToCenter);
+        if (selectableEntities.isEmpty()) {
+            return;
         }
-
-        return selectableEntities.get(0);
+        Entity selectedEntity = null;
+        float closestDistance = RAY_RANGE+1;
+        for (Entity entity:selectableEntities) {
+            float distanceToBoundingSphere = getObjectCollisionDistance(currentRay, entity.getPosition(), 5);
+            if (distanceToBoundingSphere < closestDistance ) {
+                selectedEntity = entity;
+                closestDistance = distanceToBoundingSphere;
+            }
+        }
+        if (selectedEntity != null) {
+            selectedEntity.increaseRotation(1, 1, 1);
+        }
     }
 
     private float getObjectCollisionDistance(Vector3f mouseRay, Vector3f objectPosition, float objectRadius) {

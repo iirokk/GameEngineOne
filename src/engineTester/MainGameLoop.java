@@ -129,7 +129,7 @@ public class MainGameLoop {
 
 		float timeOfDay = 12.60f;
 		while (!Display.isCloseRequested()) {
-			timeOfDay += 0.01;
+			timeOfDay += DisplayManager.getFrameTimeSeconds() / 10f;
 			if (timeOfDay >= 24) {
 				timeOfDay = 0f;
 			}
@@ -142,6 +142,7 @@ public class MainGameLoop {
 			camera.move();
 			player.move(terrainMap);
 			mousePicker.update();  // always update after camera update
+			mouseSelector.mouseSelectEntity(entities); // always after mousePicker update
 
 			// game logic
 
