@@ -122,6 +122,10 @@ public class MasterRenderer {
         terrainShader.cleanUp();
     }
 
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
+    }
+
     private static void calculateSkyColor(float dayNightBlendFactor) {
         SKY_RED = nightSkyRed * dayNightBlendFactor + (1 - dayNightBlendFactor) * daySkyRed;
         SKY_GREEN = nightSkyGreen * dayNightBlendFactor + (1 - dayNightBlendFactor) * daySkyGreen;

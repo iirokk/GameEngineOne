@@ -9,6 +9,7 @@ import guis.GuiTexture;
 import models.TexturedModel;
 import objConverter.ModelData;
 import objConverter.OBJFileLoader;
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -19,6 +20,8 @@ import terrain.TerrainMap;
 import textures.ModelTexture;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
+import toolbox.MousePicker;
+import toolbox.MouseSelector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,8 +124,10 @@ public class MainGameLoop {
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 
 		MasterRenderer renderer = new MasterRenderer(loader);
+		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
+		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
 
-		float timeOfDay = 22.60f;
+		float timeOfDay = 12.60f;
 		while (!Display.isCloseRequested()) {
 			timeOfDay += 0.01;
 			if (timeOfDay >= 24) {
@@ -136,8 +141,11 @@ public class MainGameLoop {
 
 			camera.move();
 			player.move(terrainMap);
-			
+			mousePicker.update();  // always update after camera update
+
 			// game logic
+
+
 			
 			// render
 			for (Entity entity:entities) {
