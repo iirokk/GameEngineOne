@@ -174,21 +174,20 @@ public class MainGameLoop {
 	}
 
 	private static Vector3f calculateSunPosition(float timeOfDay) {
-		// sun position x y z
+		// y upward, x east-west, z north-south
 		float sunriseTime = 3f;
 		float sunsetTime = 24f;
 		float noonTime = (sunriseTime + sunsetTime)/2;
 
 		// TODO: these have to be adjusted to more natural functions
-		float zPosition = (float) Math.cos((noonTime-timeOfDay) / 24 * Math.PI) * 1000;
-		float yPosition = (float) Math.cos((noonTime-timeOfDay) / 24 * Math.PI) * 1000;
-		float xPosition = (float) Math.cos((noonTime-timeOfDay) / 12 * Math.PI) * 1000;
+		float zPosition = (float) (-1000 + Math.sin(timeOfDay / 24 * Math.PI) * 1000);
+		float yPosition = (float) Math.sin(timeOfDay / 24 * Math.PI) * 2000;
+		float xPosition = (timeOfDay - 12) * 1000;
 
 		Vector3f newPosition = new Vector3f();
 		newPosition.x = xPosition;
 		newPosition.y = yPosition;
 		newPosition.z = zPosition;
-
 		return newPosition;
 	}
 
