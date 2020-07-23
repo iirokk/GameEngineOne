@@ -21,6 +21,10 @@ import textures.TerrainTexture;
 import textures.TerrainTexturePack;
 import toolbox.MousePicker;
 import toolbox.MouseSelector;
+import water.WaterFrameBuffers;
+import water.WaterRenderer;
+import water.WaterShader;
+import water.WaterTile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +45,8 @@ public class MainGameLoop {
 	public static void main(String[] args) {
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
+		MasterRenderer renderer = new MasterRenderer(loader);
+		GuiRenderer guiRenderer = new GuiRenderer(loader);
 
 		// Terrain
 		TerrainMap terrainMap = new TerrainMap();
@@ -54,6 +60,13 @@ public class MainGameLoop {
 		terrainMap.addTerrain(new Terrain(0, -1, loader, texturePack, blendMap, "heightmap"));
 		terrainMap.addTerrain(new Terrain(-1, 0, loader, texturePack, blendMap, "heightmap"));
 		terrainMap.addTerrain(new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap"));
+
+		// Water
+		WaterShader waterShader = new WaterShader();
+		WaterRenderer waterRenderer = new WaterRenderer(loader,waterShader, renderer.getProjectionMatrix());
+		List<WaterTile> waterTiles = new ArrayList<>();
+		waterTiles.add(new WaterTile(175, -175, -1.5f));
+		WaterFrameBuffers fbos = new WaterFrameBuffers();
 
 		// creating entities list
 		List<Entity> entities = new ArrayList<>();
@@ -116,18 +129,20 @@ public class MainGameLoop {
 		lightSources.add(campFire);
 
 		// GUI
-		List<GuiTexture> guis = new ArrayList<>();
+		List<GuiTexture> guiTextures = new ArrayList<>();
 		GuiTexture guiCompass = new GuiTexture(loader.loadTexture("gui/compass"), new Vector2f(0f, -0.85f), new Vector2f(0.25f, 0.05f));
-		guis.add(guiCompass);
+		guiTextures.add(guiCompass);
 		GuiTexture guiCompassPointer = new GuiTexture(loader.loadTexture("gui/loc_indicator"), new Vector2f(0.1f, -0.85f), new Vector2f(0.02f, 0.03f));
-		guis.add(guiCompassPointer);
+		guiTextures.add(guiCompassPointer);
 		GuiTexture guiHealth = new GuiTexture(loader.loadTexture("gui/health_indicator"), new Vector2f(0f, -0.92f), new Vector2f(0.25f, 0.01f));
-		guis.add(guiHealth);
-		GuiRenderer guiRenderer = new GuiRenderer(loader);
+		guiTextures.add(guiHealth);
 
-		MasterRenderer renderer = new MasterRenderer(loader);
+
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
+
+		GuiTexture gui = new GuiTexture(fbos.getReflectionTexture(), new Vector2f(-0.5f, 0.5f), new Vector2f(0.5f, 0.5f));
+		guiTextures.add(gui);
 
 		float timeOfDay = 12.60f;
 		while (!Display.isCloseRequested()) {
@@ -149,10 +164,17 @@ public class MainGameLoop {
 			// game logic
 
 			// render
+			fbos.bindReflectionFrameBuffer();
 			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor);
-			guiRenderer.render(guis);
+			fbos.unbindCurrentFrameBuffer();
+
+			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor);
+			waterRenderer.render(waterTiles, camera);
+			guiRenderer.render(guiTextures);
 			DisplayManager.updateDisplay();
 		}
+		fbos.cleanUp();
+		waterShader.cleanUp();
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
 		loader.cleanUp();
