@@ -3,6 +3,7 @@ package entities;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
+import terrain.TerrainMap;
 
 import javax.swing.*;
 
@@ -15,9 +16,12 @@ public class Camera {
     private float distanceFromPlayer = 50;
     private float angleAroundPlayer = 50;
     private final float playerHeightOffset = 6;
+    private final TerrainMap terrainMap;
+    private final float minimumCameraHeight = 2.5f;
 
-    public Camera(Player player) {
+    public Camera(Player player, TerrainMap terrainMap) {
         this.player = player;
+        this.terrainMap = terrainMap;
     }
 
     public void move() {
@@ -27,6 +31,10 @@ public class Camera {
         float horizontalDistance = calculateHorizontalDistance();
         float verticalDistance = calculateVerticalDistance();
         calculateCameraPosition(horizontalDistance, verticalDistance);
+        float minimumCameraY = terrainMap.getHeightOfTerrain(position.x, position.y) + minimumCameraHeight;
+        if (position.y < terrainMap.getHeightOfTerrain(position.x, position.y) + minimumCameraHeight ) {
+            position.y = minimumCameraY;
+        }
         this.yaw = 180 - (player.getRotY() + angleAroundPlayer);
     }
 

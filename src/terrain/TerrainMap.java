@@ -20,7 +20,6 @@ public class TerrainMap {
     private static Terrain getTerrainOfPosition(float worldX, float worldZ) {
         int terrainPositionX = (int) Math.floor(worldX / Terrain.SIZE);
         int terrainPositionZ = (int) Math.floor(worldZ / Terrain.SIZE);
-
         return terrains.get(terrainPositionX + ":" + terrainPositionZ);
     }
 

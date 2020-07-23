@@ -58,6 +58,7 @@ public class MainGameLoop {
 
 		// creating entities list
 		List<Entity> entities = new ArrayList<>();
+		List<Entity> selectableEntities = new ArrayList<>();
 
 		ModelData modelData = OBJFileLoader.loadOBJ("fern");
 		RawModel model1 = loader.loadToVAO(modelData.getVertices(), modelData.getTextureCoords(), modelData.getNormals(),
@@ -91,8 +92,10 @@ public class MainGameLoop {
 			float xPos = randomFloat(random, -800, 800);
 			float zPos = randomFloat(random, -800, 800);
 			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
-			entities.add(new Entity(texturedModel2, new Vector3f(xPos, yPos, zPos),
-					0, randomFloat(random),0,7));
+			Entity e = new Entity(texturedModel2, new Vector3f(xPos, yPos, zPos),
+					0, randomFloat(random),0,7);
+			entities.add(e);
+			selectableEntities.add(e);
 		}
 
 		// Player
@@ -102,7 +105,7 @@ public class MainGameLoop {
 		TexturedModel playerTexturedModel = new TexturedModel(playerRawModel, new ModelTexture(loader.loadTexture("black_leather")));
 		Player player = new Player(playerTexturedModel, new Vector3f(100, 0, -50), 0, 0, 0, 2);
 
-		Camera camera = new Camera(player);
+		Camera camera = new Camera(player, terrainMap);
 
 		// Light
 		List<Light> lightSources = new ArrayList<>();
@@ -142,7 +145,7 @@ public class MainGameLoop {
 			camera.move();
 			player.move(terrainMap);
 			mousePicker.update();  // always update after camera update
-			mouseSelector.mouseSelectEntity(entities); // always after mousePicker update
+			mouseSelector.mouseSelectEntity(selectableEntities); // always after mousePicker update
 
 			// game logic
 
@@ -164,6 +167,7 @@ public class MainGameLoop {
 		}
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
+
 		loader.cleanUp();
 		DisplayManager.closeDisplay();
 	}
