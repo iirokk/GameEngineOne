@@ -160,14 +160,14 @@ public class MainGameLoop {
 	}
 
 	private static float calculateDayNightBlendFactor(float timeOfDay) {
-		if (timeOfDay < 3) {
+		if (timeOfDay < 2 || timeOfDay > 22) {
 			return 1f;  // full night
-		} else if (timeOfDay > 6 && timeOfDay < 21){
+		} else if (timeOfDay > 5 && timeOfDay < 18){
 			return 0f; // full day
-		} else if (timeOfDay >= 3 && timeOfDay <= 6) {
-			return 1- (timeOfDay - 3) / 3; // morning
-		} else if (timeOfDay >= 21) {
-			return (timeOfDay - 21) / 3; // evening
+		} else if (timeOfDay >= 2 && timeOfDay <= 5) {
+			return 1- (timeOfDay - 2) / 3; // morning
+		} else if (timeOfDay >= 19 && timeOfDay <= 22) {
+			return (timeOfDay - 19) / 3; // evening
 		} else {
 			return 0f;
 		}
@@ -175,14 +175,9 @@ public class MainGameLoop {
 
 	private static Vector3f calculateSunPosition(float timeOfDay) {
 		// y upward, x east-west, z north-south
-		float sunriseTime = 3f;
-		float sunsetTime = 24f;
-		float noonTime = (sunriseTime + sunsetTime)/2;
-
-		// TODO: these have to be adjusted to more natural functions
-		float zPosition = (float) (-1000 + Math.sin(timeOfDay / 24 * Math.PI) * 1000);
-		float yPosition = (float) Math.sin(timeOfDay / 24 * Math.PI) * 2000;
-		float xPosition = (timeOfDay - 12) * 1000;
+		float yPosition = (float) (Math.cos(Math.PI * (timeOfDay-12) / 12) +1)/2 * 1500;
+		float zPosition = (float) -(Math.cos(Math.PI * (timeOfDay-12) / 12) +0.5)/2 * 2000;
+		float xPosition = (float) (Math.cos(Math.PI * (timeOfDay-12) / 12))/16 * 2000;
 
 		Vector3f newPosition = new Vector3f();
 		newPosition.x = xPosition;
@@ -192,7 +187,7 @@ public class MainGameLoop {
 	}
 
 	private static Vector3f calculateSunColor(float nightBlendFactor, Vector3f sunColor) {
-		Vector3f shadingVector = new Vector3f(1 + nightBlendFactor, 1 + 0.25f * nightBlendFactor, 1);
+		Vector3f shadingVector = new Vector3f(1 + nightBlendFactor, 1 + 0.35f * nightBlendFactor, 1);
 		shadingVector.scale(1- nightBlendFactor);
 
 		Vector3f finalColor = new Vector3f();
