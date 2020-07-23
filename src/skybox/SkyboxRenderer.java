@@ -85,6 +85,7 @@ public class SkyboxRenderer {
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, cube.getVertexCount());
         GL20.glDisableVertexAttribArray(0);
         GL30.glBindVertexArray(0);
+        shader.stop();
     }
 
     public void bindTextures(float blendFactor) {
@@ -93,5 +94,9 @@ public class SkyboxRenderer {
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, nightTexture);
         shader.loadBlendFactor(blendFactor);
+    }
+
+    public void cleanUp() {
+        shader.cleanUp();
     }
 }

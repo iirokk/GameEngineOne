@@ -120,6 +120,7 @@ public class MasterRenderer {
     public void cleanUp(){
         shader.cleanUp();
         terrainShader.cleanUp();
+        skyboxRenderer.cleanUp();
     }
 
     public Matrix4f getProjectionMatrix() {
