@@ -51,10 +51,8 @@ public class MasterRenderer {
         skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
     }
 
-    public void render(List<Light> lights, Camera camera, float timeOfDay){
-        float dayNightBlendFactor = calculateBlendFactor(timeOfDay);
+    public void render(List<Light> lights, Camera camera, float dayNightBlendFactor){
         calculateSkyColor(dayNightBlendFactor);
-
         prepare();
         shader.start();
         shader.loadSkyColor(SKY_RED, SKY_GREEN, SKY_BLUE);
@@ -122,20 +120,6 @@ public class MasterRenderer {
     public void cleanUp(){
         shader.cleanUp();
         terrainShader.cleanUp();
-    }
-
-    private float calculateBlendFactor(float timeOfDay) {
-        if (timeOfDay < 3) {
-            return 1f;  // full night
-        } else if (timeOfDay > 6 && timeOfDay < 21){
-            return 0f; // full day
-        } else if (timeOfDay >= 3 && timeOfDay <= 6) {
-            return 1- (timeOfDay - 3) / 3; // morning
-        } else if (timeOfDay >= 21) {
-            return (timeOfDay - 21) / 3; // evening
-        } else {
-            return 0f;
-        }
     }
 
     private static void calculateSkyColor(float dayNightBlendFactor) {

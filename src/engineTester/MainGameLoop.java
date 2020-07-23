@@ -103,7 +103,8 @@ public class MainGameLoop {
 
 		// Light
 		List<Light> lightSources = new ArrayList<>();
-		Light sun = new Light(new Vector3f(0,1000,-1000), new Vector3f(1.2f, 1.2f,1.2f));
+		Vector3f sunOriginalColor = new Vector3f(1.2f, 1.2f,1.2f);
+		Light sun = new Light(new Vector3f(0,10,0), sunOriginalColor);
 		lightSources.add(sun);
 		Light campFire = new Light(new Vector3f(5,10,0), new Vector3f(2.6f,2.0f,1.3f),
 				new Vector3f(1,0.001f,0.001f));
@@ -121,12 +122,18 @@ public class MainGameLoop {
 
 		MasterRenderer renderer = new MasterRenderer(loader);
 
-		float timeOfDay = 13.60f;
+		float timeOfDay = 22.60f;
 		while (!Display.isCloseRequested()) {
-			timeOfDay += 0.001;
+			timeOfDay += 0.01;
 			if (timeOfDay >= 24) {
 				timeOfDay = 0f;
 			}
+			float dayNightBlendFactor = calculateDayNightBlendFactor(timeOfDay);
+			// set lower sun brightness during night
+			lightSources.get(0).setColor(calculateSunColor(dayNightBlendFactor, sunOriginalColor));
+			// set sun position during the day
+			lightSources.get(0).setPosition(calculateSunPosition(timeOfDay));
+
 			camera.move();
 			player.move(terrainMap);
 			
@@ -139,7 +146,7 @@ public class MainGameLoop {
 			for (Terrain terrain:terrainMap.getAllTerrains()) {
 				renderer.processTerrain(terrain);
 			}
-			renderer.render(lightSources, camera, timeOfDay);
+			renderer.render(lightSources, camera, dayNightBlendFactor);
 			renderer.processEntity(player);
 
 			guiRenderer.render(guis);
@@ -150,5 +157,49 @@ public class MainGameLoop {
 		renderer.cleanUp();
 		loader.cleanUp();
 		DisplayManager.closeDisplay();
+	}
+
+	private static float calculateDayNightBlendFactor(float timeOfDay) {
+		if (timeOfDay < 3) {
+			return 1f;  // full night
+		} else if (timeOfDay > 6 && timeOfDay < 21){
+			return 0f; // full day
+		} else if (timeOfDay >= 3 && timeOfDay <= 6) {
+			return 1- (timeOfDay - 3) / 3; // morning
+		} else if (timeOfDay >= 21) {
+			return (timeOfDay - 21) / 3; // evening
+		} else {
+			return 0f;
+		}
+	}
+
+	private static Vector3f calculateSunPosition(float timeOfDay) {
+		// sun position x y z
+		float sunriseTime = 3f;
+		float sunsetTime = 24f;
+		float noonTime = (sunriseTime + sunsetTime)/2;
+
+		// TODO: these have to be adjusted to more natural functions
+		float zPosition = (float) Math.cos((noonTime-timeOfDay) / 24 * Math.PI) * 1000;
+		float yPosition = (float) Math.cos((noonTime-timeOfDay) / 24 * Math.PI) * 1000;
+		float xPosition = (float) Math.cos((noonTime-timeOfDay) / 12 * Math.PI) * 1000;
+
+		Vector3f newPosition = new Vector3f();
+		newPosition.x = xPosition;
+		newPosition.y = yPosition;
+		newPosition.z = zPosition;
+
+		return newPosition;
+	}
+
+	private static Vector3f calculateSunColor(float nightBlendFactor, Vector3f sunColor) {
+		Vector3f shadingVector = new Vector3f(1 + nightBlendFactor, 1 + 0.25f * nightBlendFactor, 1);
+		shadingVector.scale(1- nightBlendFactor);
+
+		Vector3f finalColor = new Vector3f();
+		finalColor.x = sunColor.x * shadingVector.x;
+		finalColor.y = sunColor.y * shadingVector.y;
+		finalColor.z = sunColor.z * shadingVector.z;
+		return finalColor;
 	}
 }
