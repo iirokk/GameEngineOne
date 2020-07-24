@@ -22,8 +22,8 @@ import java.util.Map;
 public class MasterRenderer {
 
     private static final float FOV = 70;
-    private static final float NEAR_PLANE = 0.1f;
-    private static final float FAR_PLANE = 1000;  // also modify sky box size accordingly
+    private static final float NEAR_PLANE = 0.1f;  // if changing these,
+    private static final float FAR_PLANE = 1000;  // adjust change sky box size and waterFragment near/far planes too
     private static float SKY_RED;
     private static float SKY_GREEN;
     private static float SKY_BLUE;

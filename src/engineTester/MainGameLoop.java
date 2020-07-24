@@ -177,7 +177,7 @@ public class MainGameLoop {
 			// render refraction
 			frameBuffers.bindRefractionFrameBuffer();
 			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
-					new Vector4f(0, -1, 0, waterTiles.get(0).getHeight()+2f));
+					new Vector4f(0, -1, 0, waterTiles.get(0).getHeight()+1f));
 			// raise clipping plane level to reduce glitching at water edge (try removing later)
 
 			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
