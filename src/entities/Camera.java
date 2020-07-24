@@ -31,8 +31,8 @@ public class Camera {
         float horizontalDistance = calculateHorizontalDistance();
         float verticalDistance = calculateVerticalDistance();
         calculateCameraPosition(horizontalDistance, verticalDistance);
-        float minimumCameraY = terrainMap.getHeightOfTerrain(position.x, position.y) + minimumCameraHeight;
-        if (position.y < terrainMap.getHeightOfTerrain(position.x, position.y) + minimumCameraHeight ) {
+        float minimumCameraY = terrainMap.getHeightOfTerrain(position.x, position.y) + minimumCameraHeight * distanceFromPlayer/50;
+        if (position.y < terrainMap.getHeightOfTerrain(position.x, position.y) + minimumCameraHeight * distanceFromPlayer/50) {
             position.y = minimumCameraY;
         }
         this.yaw = 180 - (player.getRotY() + angleAroundPlayer);

@@ -2,6 +2,7 @@
   <dictionary name="Iiro">
     <words>
       <w>coords</w>
+      <w>dudv</w>
     </words>
   </dictionary>
 </component>

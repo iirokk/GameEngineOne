@@ -147,9 +147,7 @@ public class MainGameLoop {
 		float timeOfDay = 12.60f;
 		while (!Display.isCloseRequested()) {
 			timeOfDay += DisplayManager.getFrameTimeSeconds() / 10f;
-			if (timeOfDay >= 24) {
-				timeOfDay = 0f;
-			}
+			timeOfDay %= 24;
 			float dayNightBlendFactor = calculateDayNightBlendFactor(timeOfDay);
 			// set lower sun brightness during night
 			lightSources.get(0).setColor(calculateSunColor(dayNightBlendFactor, sunOriginalColor));
@@ -179,7 +177,8 @@ public class MainGameLoop {
 			// render refraction
 			frameBuffers.bindRefractionFrameBuffer();
 			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
-					new Vector4f(0, -1, 0, waterTiles.get(0).getHeight()));
+					new Vector4f(0, -1, 0, waterTiles.get(0).getHeight()+2f));
+			// raise clipping plane level to reduce glitching at water edge (try removing later)
 
 			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 			frameBuffers.unbindCurrentFrameBuffer();
