@@ -65,11 +65,11 @@ public class MainGameLoop {
 		terrainMap.addTerrain(new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap"));
 
 		// Water
+		WaterFrameBuffers frameBuffers = new WaterFrameBuffers();
 		WaterShader waterShader = new WaterShader();
-		WaterRenderer waterRenderer = new WaterRenderer(loader,waterShader, renderer.getProjectionMatrix());
+		WaterRenderer waterRenderer = new WaterRenderer(loader,waterShader, renderer.getProjectionMatrix(), frameBuffers);
 		List<WaterTile> waterTiles = new ArrayList<>();
 		waterTiles.add(new WaterTile(175, -175, -1.5f));
-		WaterFrameBuffers frameBuffers = new WaterFrameBuffers();
 
 		// creating entities list
 		List<Entity> entities = new ArrayList<>();
@@ -143,11 +143,6 @@ public class MainGameLoop {
 
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
-
-		GuiTexture refraction = new GuiTexture(frameBuffers.getRefractionTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
-		GuiTexture reflection = new GuiTexture(frameBuffers.getReflectionTexture(), new Vector2f(-0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
-		guiTextures.add(refraction);
-		guiTextures.add(reflection);
 
 		float timeOfDay = 12.60f;
 		while (!Display.isCloseRequested()) {

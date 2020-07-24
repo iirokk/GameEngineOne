@@ -17,7 +17,7 @@ public class Camera {
     private float angleAroundPlayer = 50;
     private final float playerHeightOffset = 6;
     private final TerrainMap terrainMap;
-    private final float minimumCameraHeight = 2.5f;
+    private final float minimumCameraHeight = 5f;
 
     public Camera(Player player, TerrainMap terrainMap) {
         this.player = player;
