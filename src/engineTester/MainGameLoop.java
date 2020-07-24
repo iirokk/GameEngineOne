@@ -54,11 +54,10 @@ public class MainGameLoop {
 		TerrainMap terrainMap = terrainLoader.generateTerrainMap();
 
 		// Water
+		List<WaterTile> waterTiles = terrainMap.getWaterTiles();
 		WaterFrameBuffers frameBuffers = new WaterFrameBuffers();
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(loader,waterShader, renderer.getProjectionMatrix(), frameBuffers);
-		List<WaterTile> waterTiles = new ArrayList<>();
-		waterTiles.add(new WaterTile(175, -175, -1.5f));
 
 		// creating entities list
 		List<Entity> entities = new ArrayList<>();

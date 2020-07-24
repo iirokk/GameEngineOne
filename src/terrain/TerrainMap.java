@@ -1,20 +1,29 @@
 package terrain;
 
+import water.WaterTile;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
 public class TerrainMap {
     private static Map<String, Terrain> terrains;
+    private static List<WaterTile> waterTiles;
 
     public TerrainMap() {
         terrains = new HashMap<>();
+        waterTiles = new ArrayList<>();
     }
 
     public void addTerrain(Terrain terrain) {
         String key = terrain.getGridX() + ":" + terrain.getGridZ();
         terrains.put(key, terrain);
+    }
+
+    public void addWaterTile(WaterTile waterTile) {
+        waterTiles.add(waterTile);
     }
 
     private static Terrain getTerrainOfPosition(float worldX, float worldZ) {
@@ -33,5 +42,9 @@ public class TerrainMap {
 
     public ArrayList<Terrain> getAllTerrains() {
         return new ArrayList<>(terrains.values());
+    }
+
+    public List<WaterTile> getWaterTiles() {
+        return waterTiles;
     }
 }

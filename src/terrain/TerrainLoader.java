@@ -3,6 +3,7 @@ package terrain;
 import renderEngine.Loader;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
+import water.WaterTile;
 
 public class TerrainLoader {
 
@@ -20,6 +21,9 @@ public class TerrainLoader {
                 terrainMap.addTerrain(loadTerrainTile(texturePack, gridX, gridY));
             }
         }
+
+        terrainMap.addWaterTile(loadWaterTile());
+
         return terrainMap;
     }
 
@@ -40,5 +44,10 @@ public class TerrainLoader {
         String blendMapFile = "blendMap";
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(blendMapFile));
         return new Terrain(gridX, gridY, loader, texturePack, blendMap, "heightmap");
+    }
+
+    private WaterTile loadWaterTile() {
+        WaterTile waterTile = new WaterTile(175, -175, -1.5f);
+        return waterTile;
     }
 }
