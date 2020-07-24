@@ -184,7 +184,7 @@ public class MainGameLoop {
 			frameBuffers.unbindCurrentFrameBuffer();
 			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
 					new Vector4f(0, 0, 0, 0));
-			waterRenderer.render(waterTiles, camera);
+			waterRenderer.render(waterTiles, camera, lightSources.get(0));
 			guiRenderer.render(guiTextures);
 			DisplayManager.updateDisplay();
 		}
