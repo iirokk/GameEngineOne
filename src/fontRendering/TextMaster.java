@@ -38,6 +38,17 @@ public class TextMaster {
         textBatch.add(text);
     }
 
+    public static void updateTextString(GUIText text, String newString) {
+        // delete vao, load new vao to text object
+        loader.deleteVAO(text.getMesh());
+
+        text.setTextStringFromUpdate(newString);
+        FontType font = text.getFont();
+        TextMeshData data = font.loadText(text);
+        int vao = loader.loadToVAO(data.getVertexPositions(), data.getTextureCoords());
+        text.setMeshInfo(vao, data.getVertexCount());
+    }
+
     public static void removeText(GUIText text) {
         List<GUIText> textBatch = texts.get(text.getFont());
         textBatch.remove(text);

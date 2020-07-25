@@ -183,4 +183,7 @@ public class GUIText {
 		return textString;
 	}
 
+	public void setTextStringFromUpdate(String newString) {
+		this.textString = newString;
+	}
 }

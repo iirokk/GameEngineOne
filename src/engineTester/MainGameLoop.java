@@ -135,8 +135,8 @@ public class MainGameLoop {
 
 		// Texts
 		FontType font = new FontType(loader.loadFontTextureAtlas("segoeUI"), new File("res/fonts/segoeUI.fnt"));
-		GUIText text = new GUIText("Test text", 3, font, new Vector2f(0.5f, 0.2f), 0.5f, true);
-		text.setColour(1, 0, 0);
+		GUIText textFPS = new GUIText("FPS", 0.6f, font, new Vector2f(0.95f, 0.01f), 0.05f, false);
+		textFPS.setColour(0.8f, 0.8f, 0);
 
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
@@ -185,9 +185,8 @@ public class MainGameLoop {
 
 			// Render GUI & texts
 			guiRenderer.render(guiTextures);
+			TextMaster.updateTextString(textFPS, "FPS: " + Math.round(1/DisplayManager.getFrameTimeSeconds()));
 			TextMaster.render();
-
-
 
 			DisplayManager.updateDisplay();
 		}

@@ -176,4 +176,12 @@ public class Loader {
 		}
 		return new TextureData(buffer, width, height);
 	}
+
+	public void deleteVAO(int vaoID) {
+		vaos.remove(Integer.valueOf(vaoID));
+	}
+
+	public void deleteVBO(int vboID) {
+		vbos.remove(Integer.valueOf(vboID));
+	}
 }
