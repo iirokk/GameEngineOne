@@ -4,6 +4,9 @@ import entities.Camera;
 import entities.Entity;
 import entities.Light;
 import entities.Player;
+import fontMeshCreator.FontType;
+import fontMeshCreator.GUIText;
+import fontRendering.TextMaster;
 import guis.GuiRenderer;
 import guis.GuiTexture;
 import models.TexturedModel;
@@ -27,6 +30,7 @@ import water.WaterRenderer;
 import water.WaterShader;
 import water.WaterTile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -48,6 +52,7 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 		MasterRenderer renderer = new MasterRenderer(loader);
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
+		TextMaster.init(loader);
 
 		// Terrain
 		TerrainLoader terrainLoader = new TerrainLoader(loader);
@@ -128,6 +133,10 @@ public class MainGameLoop {
 		GuiTexture guiHealth = new GuiTexture(loader.loadTexture("gui/health_indicator"), new Vector2f(0f, -0.92f), new Vector2f(0.25f, 0.01f));
 		guiTextures.add(guiHealth);
 
+		// Texts
+		FontType font = new FontType(loader.loadFontTextureAtlas("segoeUI"), new File("res/fonts/segoeUI.fnt"));
+		GUIText text = new GUIText("Test text", 3, font, new Vector2f(0.5f, 0.2f), 0.5f, true);
+		text.setColour(1, 0, 0);
 
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
@@ -150,9 +159,9 @@ public class MainGameLoop {
 			// game logic
 
 			// render
-			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 
 			// render reflection
+			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			frameBuffers.bindReflectionFrameBuffer();
 			float cameraReflectionDistance = 2 * (camera.getPosition().y - waterTiles.get(0).getHeight());
 			camera.getPosition().y -= cameraReflectionDistance;
@@ -167,15 +176,22 @@ public class MainGameLoop {
 			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
 					new Vector4f(0, -1, 0, waterTiles.get(0).getHeight()+1f));
 			// raise clipping plane level to reduce glitching at water edge (try removing later)
-
 			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 			frameBuffers.unbindCurrentFrameBuffer();
+
 			renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
 					new Vector4f(0, 0, 0, 0));
 			waterRenderer.render(waterTiles, camera, lightSources.get(0));
+
+			// Render GUI & texts
 			guiRenderer.render(guiTextures);
+			TextMaster.render();
+
+
+
 			DisplayManager.updateDisplay();
 		}
+		TextMaster.cleanUp();
 		frameBuffers.cleanUp();
 		waterShader.cleanUp();
 		guiRenderer.cleanUp();
