@@ -21,6 +21,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 import particles.Particle;
 import particles.ParticleMaster;
+import particles.ParticleSystem;
 import renderEngine.*;
 import models.RawModel;
 import terrain.TerrainLoader;
@@ -148,6 +149,8 @@ public class MainGameLoop {
 		//testText.setBorderWidth(0.45f);
 		//testText.setTransparency(0.6f);
 
+		ParticleSystem playerParticleSystem = new ParticleSystem(10, 60, 1, 2, 1);
+
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
 
@@ -164,9 +167,7 @@ public class MainGameLoop {
 			camera.move();
 			player.move(terrainMap);
 
-			if(Keyboard.isKeyDown(Keyboard.KEY_Q)) {
-				new Particle(new Vector3f(player.getPosition()), new Vector3f(0, 100, 0), 1, 4, 0, 1);
-			}
+			playerParticleSystem.generateParticles(player.getPosition());
 			ParticleMaster.update();
 
 			mousePicker.update();  // always update after camera update
