@@ -6,9 +6,10 @@ out vec4 outColor;
 
 uniform vec3 color;
 uniform sampler2D fontAtlas;
+uniform float transparency;
 
 void main(void){
 
-    outColor = vec4(color, texture(fontAtlas, pass_textureCoords).a);
+    outColor = vec4(color, clamp(texture(fontAtlas, pass_textureCoords).a - transparency, 0.0, 1.0));
 
 }

@@ -17,7 +17,8 @@ public class GUIText {
 
 	private int textMeshVao;
 	private int vertexCount;
-	private Vector3f colour = new Vector3f(0f, 0f, 0f);
+	private Vector3f color = new Vector3f(0f, 0f, 0f);
+	private float transparency = 0;
 
 	private Vector2f position;
 	private float lineMaxSize;
@@ -88,15 +89,34 @@ public class GUIText {
 	 *            - blue value, between 0 and 1.
 	 */
 	public void setColour(float r, float g, float b) {
-		colour.set(r, g, b);
+		color.set(r, g, b);
+	}
+
+	/**
+	 * @return the transparency of the text.
+	 */
+	public float getTransparency() {
+		return transparency;
+	}
+
+	/**
+	 * Set the transparency of the text.
+	 *
+	 * @param newTransparency
+	 *            - transparency alpha value, between 0 and 1.
+	 */
+	public void setTransparency(float newTransparency) {
+		transparency = newTransparency;
 	}
 
 	/**
 	 * @return the colour of the text.
 	 */
-	public Vector3f getColour() {
-		return colour;
+	public Vector3f getColor() {
+		return color;
 	}
+
+
 
 	/**
 	 * @return The number of lines of text. This is determined when the text is

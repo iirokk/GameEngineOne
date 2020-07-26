@@ -11,6 +11,7 @@ public class FontShader extends ShaderProgram{
 
 	private int location_color;
 	private int location_translation;
+	private int location_transparency;
 
 	public FontShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -20,6 +21,7 @@ public class FontShader extends ShaderProgram{
 	protected void getAllUniformLocations() {
 		location_color = super.getUniformLocation("color");
 		location_translation = super.getUniformLocation("translation");
+		location_transparency = super.getUniformLocation("transparency");
 	}
 
 	@Override
@@ -36,5 +38,8 @@ public class FontShader extends ShaderProgram{
 		super.load2DVector(location_translation, translation);
 	}
 
+	protected void loadTransparency(Float transparency) {
+		super.loadFloat(location_transparency, transparency);
+	}
 
 }

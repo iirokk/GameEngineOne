@@ -135,8 +135,10 @@ public class MainGameLoop {
 
 		// Texts
 		FontType font = new FontType(loader.loadFontTextureAtlas("segoeUI"), new File("res/fonts/segoeUI.fnt"));
+		// FontType font2 = new FontType(loader.loadFontTextureAtlas("northumbria"), new File("res/fonts/northumbria.fnt"));
 		GUIText textFPS = new GUIText("FPS", 0.6f, font, new Vector2f(0.95f, 0.01f), 0.05f, false);
 		textFPS.setColour(0.8f, 0.8f, 0);
+		// GUIText testText = new GUIText("Testing! 1234...", 2.6f, font2, new Vector2f(0.5f, 0.1f), 0.2f, true);
 
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
