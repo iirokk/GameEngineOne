@@ -13,20 +13,23 @@ import org.lwjgl.util.vector.Vector3f;
 public class GUIText {
 
 	private String textString;
-	private float fontSize;
+	private final float fontSize;
+	private final FontType font;
 
 	private int textMeshVao;
 	private int vertexCount;
-	private Vector3f color = new Vector3f(0f, 0f, 0f);
+	private Vector3f color = new Vector3f(1f, 1f, 1f);
 	private float transparency = 0;
+	private float fontWidth = 0.4f;
+	private float fontEdgeSmoothing = 0.25f;
+	private Vector3f borderColor = new Vector3f(0.05f, 0.05f, 0.05f);
+	private float borderWidth = 0.0f;
+	private float borderEdgeSmoothing = 0.25f;
 
 	private Vector2f position;
-	private float lineMaxSize;
+	private final float lineMaxSize;
 	private int numberOfLines;
-
-	private FontType font;
-
-	private boolean centerText = false;
+	private final boolean centerText;
 
 	/**
 	 * Creates a new text, loads the text's quads into a VAO, and adds the text
@@ -88,7 +91,7 @@ public class GUIText {
 	 * @param b
 	 *            - blue value, between 0 and 1.
 	 */
-	public void setColour(float r, float g, float b) {
+	public void setColor(float r, float g, float b) {
 		color.set(r, g, b);
 	}
 
@@ -205,5 +208,49 @@ public class GUIText {
 
 	public void setTextStringFromUpdate(String newString) {
 		this.textString = newString;
+	}
+
+	public void setPosition(Vector2f position) {
+		this.position = position;
+	}
+
+	public float getFontWidth() {
+		return fontWidth;
+	}
+
+	public void setFontWidth(float fontWidth) {
+		this.fontWidth = fontWidth;
+	}
+
+	public float getFontEdgeSmoothing() {
+		return fontEdgeSmoothing;
+	}
+
+	public void setFontEdgeSmoothing(float fontEdgeSmoothing) {
+		this.fontEdgeSmoothing = fontEdgeSmoothing;
+	}
+
+	public Vector3f getBorderColor() {
+		return borderColor;
+	}
+
+	public void setBorderColor(Vector3f borderColor) {
+		this.borderColor = borderColor;
+	}
+
+	public float getBorderWidth() {
+		return borderWidth;
+	}
+
+	public void setBorderWidth(float borderWidth) {
+		this.borderWidth = borderWidth;
+	}
+
+	public float getBorderEdgeSmoothing() {
+		return borderEdgeSmoothing;
+	}
+
+	public void setBorderEdgeSmoothing(float borderEdgeSmoothing) {
+		this.borderEdgeSmoothing = borderEdgeSmoothing;
 	}
 }

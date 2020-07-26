@@ -48,6 +48,11 @@ public class FontRenderer {
 		shader.loadColor(text.getColor());
 		shader.loadTranslation(text.getPosition());
 		shader.loadTransparency(text.getTransparency());
+		shader.loadFontWidth(text.getFontWidth());
+		shader.loadFontEdgeSmoothing(text.getFontEdgeSmoothing());
+		shader.loadBorderWidth(text.getBorderWidth());
+		shader.loadBorderEdgeSmoothing(text.getBorderEdgeSmoothing());
+		shader.loadBorderColor(text.getBorderColor());
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, text.getVertexCount());
 		GL20.glDisableVertexAttribArray(0);
 		GL20.glDisableVertexAttribArray(1);

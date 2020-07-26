@@ -8,24 +8,23 @@ uniform vec3 color;
 uniform sampler2D fontAtlas;
 uniform float transparency;
 
-const float width = 0.4;
-const float edge = 0.15;
-
-const float borderWidth = 0.1;
-const float borderEdge = 0.05;
-const vec3 outlineColor = vec3(0, 0, 0);
+uniform float fontWidth;
+uniform float fontEdgeSmoothing;
+uniform float borderWidth;
+uniform float borderEdgeSmoothing;
+uniform vec3 borderColor;
 
 void main(void){
     float sampleAlpha = texture(fontAtlas, pass_textureCoords).a;
 
     float distance = 1.0 - sampleAlpha;
-    float alpha = 1.0 - smoothstep(width, width + edge + 0.05, distance);
+    float alpha = 1.0 - smoothstep(fontWidth, fontWidth + fontEdgeSmoothing, distance);
 
     float distance2 = 1.0 - sampleAlpha;
-    float outlineAlpha = 1.0 - smoothstep(width + borderWidth, width + borderWidth + borderEdge + 0.05, distance2);
+    float outlineAlpha = 1.0 - smoothstep(borderWidth, borderWidth + borderEdgeSmoothing, distance2);
 
     float overallAlpha = alpha + (1.0 - alpha) * outlineAlpha;
-    vec3 overallColor = mix(outlineColor, color, alpha/overallAlpha);
+    vec3 overallColor = mix(borderColor, color, alpha/overallAlpha);
 
     outColor = vec4(overallColor, clamp(overallAlpha - transparency, 0.0, 1.0));
 }
