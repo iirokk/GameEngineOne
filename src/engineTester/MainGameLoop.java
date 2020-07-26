@@ -152,6 +152,11 @@ public class MainGameLoop {
 
 		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleAtlas"), 4);
 		ParticleSystem playerParticleSystem = new ParticleSystem(particleTexture, 50, 60, 1, 1, 1.5f);
+		ParticleTexture fireTexture = new ParticleTexture(loader.loadTexture("fire"), 8, true);
+		ParticleSystem fireParticles = new ParticleSystem(fireTexture, 20, 0.01f, -0.08f, 3, 8);
+		fireParticles.randomizeRotation();
+		fireParticles.setDirection(new Vector3f(0,1,0), 0.2f);
+		fireParticles.setScaleVariance(5f);
 
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
@@ -170,7 +175,8 @@ public class MainGameLoop {
 			player.move(terrainMap);
 
 			playerParticleSystem.generateParticles(player.getPosition());
-			ParticleMaster.update();
+			fireParticles.generateParticles(new Vector3f(0, 0, 0));
+			ParticleMaster.update(camera);
 
 			mousePicker.update();  // always update after camera update
 			mouseSelector.mouseSelectEntity(selectableEntities); // always after mousePicker update

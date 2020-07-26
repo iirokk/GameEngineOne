@@ -1,6 +1,7 @@
 package particles;
 
 
+import entities.Camera;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import physics.EntityPhysicsQuantities;
@@ -21,6 +22,7 @@ public class Particle {
     private Vector2f texOffset1 = new Vector2f();
     private Vector2f texOffset2 = new Vector2f();
     private float blendStage;
+    private float distanceFromCamera;
 
     public Particle(ParticleTexture texture, Vector3f position, Vector3f velocity, float gravityFactor, float lifeLength, float rotation, float scale) {
         this.texture = texture;
@@ -47,8 +49,9 @@ public class Particle {
         return scale;
     }
 
-    protected boolean update() {
+    protected boolean update(Camera camera) {
         Gravity.objectPositionVelocityChange(physicsQuantities);
+        distanceFromCamera = Vector3f.sub(camera.getPosition(), getPosition(), null).lengthSquared();
         updateTextureCoordsInfo();
         elapsedTime += DisplayManager.getFrameTimeSeconds();
         return elapsedTime < lifeLength;
@@ -82,5 +85,9 @@ public class Particle {
 
     public float getBlendStage() {
         return blendStage;
+    }
+
+    public float getDistanceFromCamera() {
+        return distanceFromCamera;
     }
 }
