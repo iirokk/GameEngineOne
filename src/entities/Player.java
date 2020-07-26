@@ -3,6 +3,7 @@ package entities;
 import models.TexturedModel;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
+import physics.Gravity;
 import renderEngine.DisplayManager;
 import terrain.Terrain;
 import terrain.TerrainMap;
@@ -11,7 +12,6 @@ public class Player extends Entity {
 
     private static final float RUN_SPEED = 20;
     private static final float TURN_SPEED = 180;
-    private static final float GRAVITY = -100;
     private static final float JUMP_POWER = 40;
 
     private float currentSpeed = 0;
@@ -30,7 +30,7 @@ public class Player extends Entity {
         float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
         float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
 
-        upwardSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds();
+        upwardSpeed += Gravity.getDeltaVerticalVelocity();
         super.increasePosition(dx, upwardSpeed * DisplayManager.getFrameTimeSeconds(), dz);
 
         float terrainHeight = terrainMap.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
