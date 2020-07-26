@@ -15,15 +15,16 @@ public class ParticleSystem {
     private final float gravityFactor;
     private final float averageLifeLength;
     private final float averageScale;
-
     private float speedVariance, lifeVariance, scaleVariance = 0;
     private boolean randomRotation = false;
     private Vector3f direction;
     private float directionDeviation = 0;
+    private ParticleTexture texture;
 
     private final Random random = new Random();
 
-    public ParticleSystem(float pps, float speed, float gravityFactor, float lifeLength, float scale) {
+    public ParticleSystem(ParticleTexture texture, float pps, float speed, float gravityFactor, float lifeLength, float scale) {
+        this.texture = texture;
         this.pps = pps;
         this.averageSpeed = speed;
         this.gravityFactor = gravityFactor;
@@ -92,7 +93,7 @@ public class ParticleSystem {
         velocity.scale(generateValue(averageSpeed, speedVariance));
         float scale = generateValue(averageScale, scaleVariance);
         float lifeLength = generateValue(averageLifeLength, lifeVariance);
-        new Particle(new Vector3f(center), velocity, gravityFactor, lifeLength, generateRotation(), scale);
+        new Particle(texture, new Vector3f(center), velocity, gravityFactor, lifeLength, generateRotation(), scale);
     }
 
     private float generateValue(float average, float errorMargin) {

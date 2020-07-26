@@ -22,6 +22,7 @@ import org.lwjgl.util.vector.Vector4f;
 import particles.Particle;
 import particles.ParticleMaster;
 import particles.ParticleSystem;
+import particles.ParticleTexture;
 import renderEngine.*;
 import models.RawModel;
 import terrain.TerrainLoader;
@@ -149,7 +150,8 @@ public class MainGameLoop {
 		//testText.setBorderWidth(0.45f);
 		//testText.setTransparency(0.6f);
 
-		ParticleSystem playerParticleSystem = new ParticleSystem(10, 60, 1, 2, 1);
+		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleAtlas"), 4);
+		ParticleSystem playerParticleSystem = new ParticleSystem(particleTexture, 50, 60, 1, 1, 1.5f);
 
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
