@@ -12,12 +12,17 @@ import guis.GuiTexture;
 import models.TexturedModel;
 import objConverter.ModelData;
 import objConverter.OBJFileLoader;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+import particles.Particle;
+import particles.ParticleMaster;
+import particles.ParticleSystem;
+import particles.ParticleTexture;
 import renderEngine.*;
 import models.RawModel;
 import terrain.TerrainLoader;
@@ -31,6 +36,7 @@ import water.WaterShader;
 import water.WaterTile;
 
 import java.io.File;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -51,6 +57,7 @@ public class MainGameLoop {
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
 		MasterRenderer renderer = new MasterRenderer(loader);
+		ParticleMaster.init(loader, renderer.getProjectionMatrix());
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 		TextMaster.init(loader);
 
@@ -135,13 +142,21 @@ public class MainGameLoop {
 
 		// Texts
 		FontType font = new FontType(loader.loadFontTextureAtlas("segoe"), new File("res/fonts/segoe.fnt"));
-		FontType font2 = new FontType(loader.loadFontTextureAtlas("northumbria"), new File("res/fonts/northumbria.fnt"));
 		GUIText textFPS = new GUIText("FPS", 0.6f, font, new Vector2f(0.95f, 0.01f), 0.05f, false);
 		textFPS.setColor(0.8f, 0.8f, 0);
+		//FontType font2 = new FontType(loader.loadFontTextureAtlas("northumbria"), new File("res/fonts/northumbria.fnt"));
 		//GUIText testText = new GUIText("Testing larger font rendering.", 1.6f, font2, new Vector2f(0.5f, 0.1f), 0.2f, true);
 		//testText.setColor(0.85f, 0.85f, 0.85f);
 		//testText.setBorderWidth(0.45f);
 		//testText.setTransparency(0.6f);
+
+		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleAtlas"), 4);
+		ParticleSystem playerParticleSystem = new ParticleSystem(particleTexture, 50, 60, 1, 1, 1.5f);
+		ParticleTexture fireTexture = new ParticleTexture(loader.loadTexture("fire"), 8, true);
+		ParticleSystem fireParticles = new ParticleSystem(fireTexture, 20, 0.01f, -0.08f, 3, 8);
+		fireParticles.randomizeRotation();
+		fireParticles.setDirection(new Vector3f(0,1,0), 0.2f);
+		fireParticles.setScaleVariance(5f);
 
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
@@ -158,6 +173,11 @@ public class MainGameLoop {
 
 			camera.move();
 			player.move(terrainMap);
+
+			playerParticleSystem.generateParticles(player.getPosition());
+			fireParticles.generateParticles(new Vector3f(0, 0, 0));
+			ParticleMaster.update(camera);
+
 			mousePicker.update();  // always update after camera update
 			mouseSelector.mouseSelectEntity(selectableEntities); // always after mousePicker update
 
@@ -188,6 +208,9 @@ public class MainGameLoop {
 					new Vector4f(0, 0, 0, 0));
 			waterRenderer.render(waterTiles, camera, lightSources.get(0));
 
+			// render particles
+			ParticleMaster.renderParticles(camera);
+
 			// Render GUI & texts
 			guiRenderer.render(guiTextures);
 			TextMaster.updateTextString(textFPS, "FPS: " + Math.round(1/DisplayManager.getFrameTimeSeconds()));
@@ -195,6 +218,8 @@ public class MainGameLoop {
 
 			DisplayManager.updateDisplay();
 		}
+		// Clean up
+		ParticleMaster.cleanUp();
 		TextMaster.cleanUp();
 		frameBuffers.cleanUp();
 		waterShader.cleanUp();
