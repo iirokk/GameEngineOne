@@ -8,6 +8,7 @@ import water.WaterTile;
 public class TerrainLoader {
 
     private final Loader loader;
+    private final int gridSize = 8;
 
     public TerrainLoader(Loader loader) {
         this.loader = loader;
@@ -16,12 +17,11 @@ public class TerrainLoader {
     public TerrainMap generateTerrainMap() {
         TerrainMap terrainMap = new TerrainMap();
         TerrainTexturePack texturePack = loadTerrainTexturePack();
-        for (int gridX = -2; gridX < 3; gridX++) {
-            for (int gridY = -2; gridY < 3; gridY++) {
+        for (int gridX = 0; gridX < gridSize; gridX++) {
+            for (int gridY = 0; gridY < gridSize; gridY++) {
                 terrainMap.addTerrain(loadTerrainTile(texturePack, gridX, gridY));
             }
         }
-
         terrainMap.addWaterTile(loadWaterTile());
 
         return terrainMap;
@@ -42,8 +42,14 @@ public class TerrainLoader {
 
     private Terrain loadTerrainTile(TerrainTexturePack texturePack, int gridX, int gridY) {
         String blendMapFile = "blendMap";
+        int gridID = getTerrainID(gridX, gridY);
+        String heightMapFile = "terrain/heightmap/image_part_" + String.format("%3s", gridID).replace(' ', '0');
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(blendMapFile));
-        return new Terrain(gridX, gridY, loader, texturePack, blendMap, "heightmap");
+        return new Terrain(gridX, gridY, loader, texturePack, blendMap, heightMapFile);
+    }
+
+    private int getTerrainID(int gridX, int gridY) {
+        return (gridSize - gridX - 1) * 16 + gridY + 1;
     }
 
     private WaterTile loadWaterTile() {

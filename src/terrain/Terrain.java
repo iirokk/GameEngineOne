@@ -29,6 +29,7 @@ public class Terrain {
     private TerrainTexturePack texturePack;
     private TerrainTexture blendMap;
     private float[][] heights;
+    private boolean isRendered = false;
 
     public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap,
                    String heightMap) {
@@ -168,5 +169,13 @@ public class Terrain {
                     new Vector3f(0, heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
         }
         return pointHeight;
+    }
+
+    public boolean isRendered() {
+        return isRendered;
+    }
+
+    public void setRendered(boolean rendered) {
+        isRendered = rendered;
     }
 }
