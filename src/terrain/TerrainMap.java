@@ -45,8 +45,8 @@ public class TerrainMap {
     }
 
     private static Terrain getTerrainOfPosition(float worldX, float worldZ) {
-        int[] gridXZ = getTerrainGridPosition(worldX, worldZ);
-        return terrains.get(gridXZ[0] + ":" + gridXZ[1]);
+        int[] gridXY = getTerrainGridPosition(worldX, worldZ);
+        return terrains.get(gridXY[0] + ":" + gridXY[1]);
     }
 
     private static List<Terrain> getRenderedTerrainsOfPosition(float worldX, float worldZ) {

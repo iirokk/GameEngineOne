@@ -217,7 +217,7 @@ public class MainGameLoop {
 			// Render GUI & texts
 			guiRenderer.render(guiTextures);
 			TextMaster.updateTextString(textFPS, "FPS: " + Math.round(1/DisplayManager.getFrameTimeSeconds()));
-			TextMaster.updateTextString(debugText, "xyz: " + player.getPosition());
+			TextMaster.updateTextString(debugText, "xyz: " + camera.getPosition());
 			TextMaster.render();
 
 			DisplayManager.updateDisplay();

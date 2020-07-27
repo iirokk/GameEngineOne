@@ -87,14 +87,15 @@ public class Terrain {
         float[] textureCoords = new float[count*2];
         int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
         int vertexPointer = 0;
+
         for(int i=0;i<VERTEX_COUNT;i++){
             for(int j=0;j<VERTEX_COUNT;j++){
                 vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * SIZE;
-                float height = getHeight(j, i, imageTerrain);
+                float height = getHeight(i, VERTEX_COUNT - j - 1, imageTerrain);
                 heights[j][i] = height;
                 vertices[vertexPointer*3+1] = height;
                 vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * SIZE;
-                Vector3f normal = calculateNormal(j, i, imageTerrain);
+                Vector3f normal = calculateNormal(i, VERTEX_COUNT - j - 1, imageTerrain);
                 normals[vertexPointer*3] = normal.x;
                 normals[vertexPointer*3+1] = normal.y;
                 normals[vertexPointer*3+2] = normal.z;
