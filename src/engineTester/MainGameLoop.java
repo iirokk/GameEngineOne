@@ -96,15 +96,15 @@ public class MainGameLoop {
 
 		Random random = new Random();
 		for (int i = 0; i < 500; i++) {
-			float xPos = randomFloat(random) - 200;
-			float zPos = randomFloat(random) - 200;
+			float xPos = randomFloat(random);
+			float zPos = randomFloat(random);
 			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
 			entities.add(new Entity(texturedModel1, random.nextInt(4), new Vector3f(xPos, yPos, zPos),
 					0, randomFloat(random),0,0.5f));
 		}
 		for (int i = 0; i < 100; i++) {
-			float xPos = randomFloat(random, -800, 800);
-			float zPos = randomFloat(random, -800, 800);
+			float xPos = randomFloat(random, 0, 1600);
+			float zPos = randomFloat(random, 0, 1600);
 			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
 			Entity e = new Entity(texturedModel2, new Vector3f(xPos, yPos, zPos),
 					0, randomFloat(random),0,7);
