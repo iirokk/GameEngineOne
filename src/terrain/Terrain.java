@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class Terrain {
     public static final float SIZE = 800;
-    private static final float MAX_HEIGHT = 40;
+    private static final float MAX_HEIGHT = 10;
     private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 
     private float x;
@@ -29,6 +29,7 @@ public class Terrain {
     private TerrainTexturePack texturePack;
     private TerrainTexture blendMap;
     private float[][] heights;
+    private boolean isRendered = false;
 
     public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap,
                    String heightMap) {
@@ -86,14 +87,15 @@ public class Terrain {
         float[] textureCoords = new float[count*2];
         int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
         int vertexPointer = 0;
+
         for(int i=0;i<VERTEX_COUNT;i++){
             for(int j=0;j<VERTEX_COUNT;j++){
                 vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * SIZE;
-                float height = getHeight(j, i, imageTerrain);
+                float height = getHeight(i, VERTEX_COUNT - j - 1, imageTerrain);
                 heights[j][i] = height;
                 vertices[vertexPointer*3+1] = height;
                 vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * SIZE;
-                Vector3f normal = calculateNormal(j, i, imageTerrain);
+                Vector3f normal = calculateNormal(i, VERTEX_COUNT - j - 1, imageTerrain);
                 normals[vertexPointer*3] = normal.x;
                 normals[vertexPointer*3+1] = normal.y;
                 normals[vertexPointer*3+2] = normal.z;
@@ -168,5 +170,13 @@ public class Terrain {
                     new Vector3f(0, heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
         }
         return pointHeight;
+    }
+
+    public boolean isRendered() {
+        return isRendered;
+    }
+
+    public void setRendered(boolean rendered) {
+        isRendered = rendered;
     }
 }

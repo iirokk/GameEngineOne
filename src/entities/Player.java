@@ -10,7 +10,7 @@ import terrain.TerrainMap;
 
 public class Player extends Entity {
 
-    private static final float RUN_SPEED = 20;
+    private static final float RUN_SPEED = 25;
     private static final float TURN_SPEED = 180;
     private static final float JUMP_POWER = 40;
 

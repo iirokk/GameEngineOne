@@ -59,8 +59,7 @@ public class Particle {
 
     private void updateTextureCoordsInfo() {
         int stageCount = texture.getNumberOfRows() * texture.getNumberOfRows();
-        float lifeStage = elapsedTime / lifeLength;
-        float atlasProgression = lifeStage * stageCount;
+        float atlasProgression = (elapsedTime / lifeLength) * stageCount;
         int index1 = (int) Math.floor(atlasProgression);
         int index2 = index1 < stageCount - 1 ? index1 + 1 : index1;
         this.blendStage = atlasProgression % 1;

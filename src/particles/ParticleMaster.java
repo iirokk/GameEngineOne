@@ -32,8 +32,6 @@ public class ParticleMaster {
             }
             InsertionSort.sortHighToLow(list);
         }
-
-
     }
 
     public static void renderParticles(Camera camera) {

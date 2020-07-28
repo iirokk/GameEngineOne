@@ -36,7 +36,6 @@ import water.WaterShader;
 import water.WaterTile;
 
 import java.io.File;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -97,15 +96,15 @@ public class MainGameLoop {
 
 		Random random = new Random();
 		for (int i = 0; i < 500; i++) {
-			float xPos = randomFloat(random) - 200;
-			float zPos = randomFloat(random) - 200;
+			float xPos = randomFloat(random);
+			float zPos = randomFloat(random);
 			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
 			entities.add(new Entity(texturedModel1, random.nextInt(4), new Vector3f(xPos, yPos, zPos),
 					0, randomFloat(random),0,0.5f));
 		}
 		for (int i = 0; i < 100; i++) {
-			float xPos = randomFloat(random, -800, 800);
-			float zPos = randomFloat(random, -800, 800);
+			float xPos = randomFloat(random, 0, 1600);
+			float zPos = randomFloat(random, 0, 1600);
 			float yPos = terrainMap.getHeightOfTerrain(xPos, zPos);
 			Entity e = new Entity(texturedModel2, new Vector3f(xPos, yPos, zPos),
 					0, randomFloat(random),0,7);
@@ -118,7 +117,7 @@ public class MainGameLoop {
 		RawModel playerRawModel = loader.loadToVAO(playerModel.getVertices(), playerModel.getTextureCoords(),
 				playerModel.getNormals(), playerModel.getIndices());
 		TexturedModel playerTexturedModel = new TexturedModel(playerRawModel, new ModelTexture(loader.loadTexture("black_leather")));
-		Player player = new Player(playerTexturedModel, new Vector3f(100, 0, -50), 0, 0, 0, 2);
+		Player player = new Player(playerTexturedModel, new Vector3f(50, 0, 50), 0, 0, 0, 2);
 		entities.add(player);
 		Camera camera = new Camera(player, terrainMap);
 
@@ -144,6 +143,9 @@ public class MainGameLoop {
 		FontType font = new FontType(loader.loadFontTextureAtlas("segoe"), new File("res/fonts/segoe.fnt"));
 		GUIText textFPS = new GUIText("FPS", 0.6f, font, new Vector2f(0.95f, 0.01f), 0.05f, false);
 		textFPS.setColor(0.8f, 0.8f, 0);
+		GUIText debugText = new GUIText("debug", 0.6f, font, new Vector2f(0.5f, 0.01f), 0.2f, false);
+		debugText.setColor(0.8f, 0.8f, 0);
+
 		//FontType font2 = new FontType(loader.loadFontTextureAtlas("northumbria"), new File("res/fonts/northumbria.fnt"));
 		//GUIText testText = new GUIText("Testing larger font rendering.", 1.6f, font2, new Vector2f(0.5f, 0.1f), 0.2f, true);
 		//testText.setColor(0.85f, 0.85f, 0.85f);
@@ -163,7 +165,7 @@ public class MainGameLoop {
 
 		float timeOfDay = 12.60f;
 		while (!Display.isCloseRequested()) {
-			timeOfDay += DisplayManager.getFrameTimeSeconds() / 10f;
+			timeOfDay += DisplayManager.getFrameTimeSeconds() / 100f;
 			timeOfDay %= 24;
 			float dayNightBlendFactor = calculateDayNightBlendFactor(timeOfDay);
 			// set lower sun brightness during night
@@ -173,6 +175,7 @@ public class MainGameLoop {
 
 			camera.move();
 			player.move(terrainMap);
+			terrainMap.updateRenderedTerrains(player.getPosition().x, player.getPosition().z);
 
 			playerParticleSystem.generateParticles(player.getPosition());
 			fireParticles.generateParticles(new Vector3f(0, 0, 0));
@@ -214,6 +217,7 @@ public class MainGameLoop {
 			// Render GUI & texts
 			guiRenderer.render(guiTextures);
 			TextMaster.updateTextString(textFPS, "FPS: " + Math.round(1/DisplayManager.getFrameTimeSeconds()));
+			TextMaster.updateTextString(debugText, "xyz: " + camera.getPosition());
 			TextMaster.render();
 
 			DisplayManager.updateDisplay();
