@@ -168,7 +168,7 @@ public class MainGameLoop {
 
 		float timeOfDay = 12.60f;
 		while (!Display.isCloseRequested()) {
-			timeOfDay += DisplayManager.getFrameTimeSeconds() / 100f;
+			timeOfDay += DisplayManager.getFrameTimeSeconds() / 1f;
 			timeOfDay %= 24;
 			float dayNightBlendFactor = calculateDayNightBlendFactor(timeOfDay);
 			// set lower sun brightness during night
