@@ -25,6 +25,7 @@ import particles.ParticleSystem;
 import particles.ParticleTexture;
 import renderEngine.*;
 import models.RawModel;
+import shadows.ShadowMapMasterRenderer;
 import terrain.TerrainLoader;
 import terrain.TerrainMap;
 import textures.ModelTexture;
@@ -55,10 +56,6 @@ public class MainGameLoop {
 	public static void main(String[] args) {
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
-		MasterRenderer renderer = new MasterRenderer(loader);
-		ParticleMaster.init(loader, renderer.getProjectionMatrix());
-		GuiRenderer guiRenderer = new GuiRenderer(loader);
-		TextMaster.init(loader);
 
 		// Terrain
 		TerrainLoader terrainLoader = new TerrainLoader(loader);
@@ -68,7 +65,6 @@ public class MainGameLoop {
 		List<WaterTile> waterTiles = terrainMap.getWaterTiles();
 		WaterFrameBuffers frameBuffers = new WaterFrameBuffers();
 		WaterShader waterShader = new WaterShader();
-		WaterRenderer waterRenderer = new WaterRenderer(loader,waterShader, renderer.getProjectionMatrix(), frameBuffers);
 
 		// creating entities list
 		List<Entity> entities = new ArrayList<>();
@@ -130,6 +126,22 @@ public class MainGameLoop {
 				new Vector3f(1,0.001f,0.001f));
 		lightSources.add(campFire);
 
+		// Particles
+		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleAtlas"), 4);
+		ParticleSystem playerParticleSystem = new ParticleSystem(particleTexture, 50, 60, 1, 1, 1.5f);
+		ParticleTexture fireTexture = new ParticleTexture(loader.loadTexture("fire"), 8, true);
+		ParticleSystem fireParticles = new ParticleSystem(fireTexture, 20, 0.01f, -0.08f, 3, 8);
+		fireParticles.randomizeRotation();
+		fireParticles.setDirection(new Vector3f(0,1,0), 0.2f);
+		fireParticles.setScaleVariance(5f);
+
+		// Create renderers
+		MasterRenderer renderer = new MasterRenderer(loader, camera);
+		WaterRenderer waterRenderer = new WaterRenderer(loader,waterShader, renderer.getProjectionMatrix(), frameBuffers);
+		ParticleMaster.init(loader, renderer.getProjectionMatrix());
+		GuiRenderer guiRenderer = new GuiRenderer(loader);
+		TextMaster.init(loader);
+
 		// GUI
 		List<GuiTexture> guiTextures = new ArrayList<>();
 		GuiTexture guiCompass = new GuiTexture(loader.loadTexture("gui/compass"), new Vector2f(0f, -0.85f), new Vector2f(0.25f, 0.05f));
@@ -138,27 +150,20 @@ public class MainGameLoop {
 		guiTextures.add(guiCompassPointer);
 		GuiTexture guiHealth = new GuiTexture(loader.loadTexture("gui/health_indicator"), new Vector2f(0f, -0.92f), new Vector2f(0.25f, 0.01f));
 		guiTextures.add(guiHealth);
+		GuiTexture shadowMap = new GuiTexture(renderer.getShadowMapTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.5f, 0.5f));
+		guiTextures.add(shadowMap);
 
-		// Texts
+		// Texts (after renderers)
 		FontType font = new FontType(loader.loadFontTextureAtlas("segoe"), new File("res/fonts/segoe.fnt"));
 		GUIText textFPS = new GUIText("FPS", 0.6f, font, new Vector2f(0.95f, 0.01f), 0.05f, false);
 		textFPS.setColor(0.8f, 0.8f, 0);
 		GUIText debugText = new GUIText("debug", 0.6f, font, new Vector2f(0.5f, 0.01f), 0.2f, false);
 		debugText.setColor(0.8f, 0.8f, 0);
-
 		//FontType font2 = new FontType(loader.loadFontTextureAtlas("northumbria"), new File("res/fonts/northumbria.fnt"));
 		//GUIText testText = new GUIText("Testing larger font rendering.", 1.6f, font2, new Vector2f(0.5f, 0.1f), 0.2f, true);
 		//testText.setColor(0.85f, 0.85f, 0.85f);
 		//testText.setBorderWidth(0.45f);
 		//testText.setTransparency(0.6f);
-
-		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleAtlas"), 4);
-		ParticleSystem playerParticleSystem = new ParticleSystem(particleTexture, 50, 60, 1, 1, 1.5f);
-		ParticleTexture fireTexture = new ParticleTexture(loader.loadTexture("fire"), 8, true);
-		ParticleSystem fireParticles = new ParticleSystem(fireTexture, 20, 0.01f, -0.08f, 3, 8);
-		fireParticles.randomizeRotation();
-		fireParticles.setDirection(new Vector3f(0,1,0), 0.2f);
-		fireParticles.setScaleVariance(5f);
 
 		MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
 		MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
@@ -169,9 +174,9 @@ public class MainGameLoop {
 			timeOfDay %= 24;
 			float dayNightBlendFactor = calculateDayNightBlendFactor(timeOfDay);
 			// set lower sun brightness during night
-			lightSources.get(0).setColor(calculateSunColor(dayNightBlendFactor, sunOriginalColor));
+			sun.setColor(calculateSunColor(dayNightBlendFactor, sunOriginalColor));
 			// set sun position during the day
-			lightSources.get(0).setPosition(calculateSunPosition(timeOfDay));
+			sun.setPosition(calculateSunPosition(timeOfDay));
 
 			camera.move();
 			player.move(terrainMap);
@@ -187,6 +192,7 @@ public class MainGameLoop {
 			// game logic
 
 			// render
+			renderer.renderShadowMap(entities, sun);  // always before other rendering calls
 
 			// render reflection
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
@@ -249,9 +255,9 @@ public class MainGameLoop {
 
 	private static Vector3f calculateSunPosition(float timeOfDay) {
 		// y upward, x east-west, z north-south
-		float yPosition = (float) (Math.cos(Math.PI * (timeOfDay-12) / 12) +1)/2 * 1500;
-		float zPosition = (float) -(Math.cos(Math.PI * (timeOfDay-12) / 12) +0.5)/2 * 2000;
-		float xPosition = (float) (Math.cos(Math.PI * (timeOfDay-12) / 12))/16 * 2000;
+		float yPosition = (float) (Math.cos(Math.PI * (timeOfDay-12) / 12) +1)/2 * 1500000;
+		float zPosition = (float) -(Math.cos(Math.PI * (timeOfDay-12) / 12) +0.5)/2 * 2000000;
+		float xPosition = (float) (Math.cos(Math.PI * (timeOfDay-12) / 12))/16 * 2000000;
 
 		Vector3f newPosition = new Vector3f();
 		newPosition.x = xPosition;
