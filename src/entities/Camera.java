@@ -18,6 +18,8 @@ public class Camera {
     private final float playerHeightOffset = 6;
     private final TerrainMap terrainMap;
     private final float minimumCameraHeight = 5f;
+    private final float maxCameraDistance = 125f;
+    private final float minCameraDistance = 20f;
 
     public Camera(Player player, TerrainMap terrainMap) {
         this.player = player;
@@ -45,10 +47,10 @@ public class Camera {
         } else if (zoomLevel < 0) {
             distanceFromPlayer = distanceFromPlayer*1.05f;
         }
-        if (distanceFromPlayer < 20) {
-            distanceFromPlayer = 20;
-        } else if (distanceFromPlayer > 200) {
-            distanceFromPlayer = 200;
+        if (distanceFromPlayer < minCameraDistance) {
+            distanceFromPlayer = minCameraDistance;
+        } else if (distanceFromPlayer > maxCameraDistance) {
+            distanceFromPlayer = maxCameraDistance;
         }
     }
 
