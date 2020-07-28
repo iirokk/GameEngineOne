@@ -30,6 +30,8 @@ public class TerrainShader extends ShaderProgram {
     private int location_bTexture;
     private int location_blendMap;
     private int location_clippingPlane;
+    private int location_toShadowMapSpace;
+    private int location_shadowMap;
 
 
     public TerrainShader() {
@@ -57,6 +59,8 @@ public class TerrainShader extends ShaderProgram {
         location_bTexture = super.getUniformLocation("bTexture");
         location_blendMap = super.getUniformLocation("blendMap");
         location_clippingPlane = super.getUniformLocation("clippingPlane");
+        location_toShadowMapSpace = super.getUniformLocation("toShadowMapSpace");
+        location_shadowMap = super.getUniformLocation("shadowMap");
 
         location_lightPosition = new int[MAX_LIGHTS];
         location_lightColor = new int[MAX_LIGHTS];
@@ -110,11 +114,16 @@ public class TerrainShader extends ShaderProgram {
         super.load4DVector(location_clippingPlane, clippingPlane);
     }
 
+    public void loadToShadowMapSpace(Matrix4f matrix) {
+        super.loadMatrix(location_toShadowMapSpace, matrix);
+    }
+
     public void connectTextureUnits() {
         super.loadInt(location_backgroundTexture, 0);
         super.loadInt(location_rTexture, 1);
         super.loadInt(location_gTexture, 2);
         super.loadInt(location_bTexture, 3);
         super.loadInt(location_blendMap, 4);
+        super.loadInt(location_shadowMap, 5);
     }
 }

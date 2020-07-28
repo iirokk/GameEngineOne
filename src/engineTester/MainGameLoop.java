@@ -150,8 +150,6 @@ public class MainGameLoop {
 		guiTextures.add(guiCompassPointer);
 		GuiTexture guiHealth = new GuiTexture(loader.loadTexture("gui/health_indicator"), new Vector2f(0f, -0.92f), new Vector2f(0.25f, 0.01f));
 		guiTextures.add(guiHealth);
-		GuiTexture shadowMap = new GuiTexture(renderer.getShadowMapTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.5f, 0.5f));
-		guiTextures.add(shadowMap);
 
 		// Texts (after renderers)
 		FontType font = new FontType(loader.loadFontTextureAtlas("segoe"), new File("res/fonts/segoe.fnt"));
@@ -255,9 +253,10 @@ public class MainGameLoop {
 
 	private static Vector3f calculateSunPosition(float timeOfDay) {
 		// y upward, x east-west, z north-south
-		float yPosition = (float) (Math.cos(Math.PI * (timeOfDay-12) / 12) +1)/2 * 1500000;
-		float zPosition = (float) -(Math.cos(Math.PI * (timeOfDay-12) / 12) +0.5)/2 * 2000000;
-		float xPosition = (float) (Math.cos(Math.PI * (timeOfDay-12) / 12))/16 * 2000000;
+		float dayFraction = (timeOfDay-12) / 12;
+		float yPosition = (float) (Math.cos(Math.PI * dayFraction) +1)/2 * 1500000;
+		float zPosition = (float) -(Math.cos(Math.PI * dayFraction) +0.5)/2 * 2000000;
+		float xPosition = (float) (Math.cos(Math.PI * dayFraction))/16 * 2000000;
 
 		Vector3f newPosition = new Vector3f();
 		newPosition.x = xPosition;
