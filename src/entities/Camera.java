@@ -1,28 +1,24 @@
 package entities;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 import terrain.TerrainMap;
-
-import javax.swing.*;
 
 public class Camera {
     private Vector3f position = new Vector3f(0,0,0);
     private float pitch;
     private float yaw;
     private float roll;
-    private Player player;
+    private PlayerPosition playerPosition;
     private float distanceFromPlayer = 50;
-    private float angleAroundPlayer = 50;
     private final float playerHeightOffset = 6;
     private final TerrainMap terrainMap;
     private final float minimumCameraHeight = 5f;
     private final float maxCameraDistance = 125f;
     private final float minCameraDistance = 20f;
 
-    public Camera(Player player, TerrainMap terrainMap) {
-        this.player = player;
+    public Camera(PlayerPosition playerPosition, TerrainMap terrainMap) {
+        this.playerPosition = playerPosition;
         this.terrainMap = terrainMap;
     }
 
@@ -37,7 +33,7 @@ public class Camera {
         if (position.y < terrainMap.getHeightOfTerrain(position.x, position.z) + minimumCameraHeight * distanceFromPlayer/50) {
             position.y = minimumCameraY;
         }
-        this.yaw = 180 - (player.getRotY() + angleAroundPlayer);
+        this.yaw = 180 - (playerPosition.getRotY());
     }
 
     private void calculateZoom() {
@@ -69,7 +65,7 @@ public class Camera {
     private void calculateAngleAroundPlayer() {
         if(Mouse.isButtonDown(1)) {
             float angleChange = Mouse.getDX() * 0.3f;
-            angleAroundPlayer -= angleChange;
+            playerPosition.setRotY(playerPosition.getRotY() - angleChange);
         }
     }
 
@@ -82,12 +78,12 @@ public class Camera {
     }
 
     private void calculateCameraPosition(float horizontalDistance, float verticalDistance) {
-        float theta = player.getRotY() + angleAroundPlayer;  // camera angle from origin
+        float theta = playerPosition.getRotY();  // camera angle from origin
         float offsetX = (float) (horizontalDistance * Math.sin(Math.toRadians(theta)));
         float offsetZ = (float) (horizontalDistance * Math.cos(Math.toRadians(theta)));
-        position.x = player.getPosition().x - offsetX;
-        position.z = player.getPosition().z - offsetZ;
-        position.y = player.getPosition().y + verticalDistance + playerHeightOffset;  // add player height
+        position.x = playerPosition.getPosition().x - offsetX;
+        position.z = playerPosition.getPosition().z - offsetZ;
+        position.y = playerPosition.getPosition().y + verticalDistance + playerHeightOffset;  // add player height
     }
 
     public Vector3f getPosition() {
