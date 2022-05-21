@@ -1,8 +1,11 @@
 package entities;
 
-import org.lwjgl.util.vector.Vector2f;
+import lombok.Getter;
+import lombok.Setter;
 import org.lwjgl.util.vector.Vector3f;
 
+@Getter
+@Setter
 public class Light {
 
     private Vector3f position;
@@ -18,25 +21,5 @@ public class Light {
         this.position = position;
         this.color = color;
         this.attenuation = attenuation;
-    }
-
-    public Vector3f getPosition() {
-        return position;
-    }
-
-    public void setPosition(Vector3f position) {
-        this.position = position;
-    }
-
-    public Vector3f getColor() {
-        return color;
-    }
-
-    public void setColor(Vector3f color) {
-        this.color = color;
-    }
-
-    public Vector3f getAttenuation() {
-        return attenuation;
     }
 }

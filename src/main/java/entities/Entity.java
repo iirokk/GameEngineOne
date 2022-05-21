@@ -1,8 +1,12 @@
 package entities;
 
+import lombok.Getter;
+import lombok.Setter;
 import models.TexturedModel;
 import org.lwjgl.util.vector.Vector3f;
 
+@Getter
+@Setter
 public class Entity extends PositionalObject {
 
     private TexturedModel model;
@@ -37,21 +41,5 @@ public class Entity extends PositionalObject {
     public float getTextureYOffset() {
         int row = textureIndex/model.getTexture().getNumberOfRows();
         return (float) row / (float) model.getTexture().getNumberOfRows();
-    }
-
-    public TexturedModel getModel() {
-        return model;
-    }
-
-    public void setModel(TexturedModel model) {
-        this.model = model;
-    }
-
-    public float getScale() {
-        return scale;
-    }
-
-    public void setScale(float scale) {
-        this.scale = scale;
     }
 }

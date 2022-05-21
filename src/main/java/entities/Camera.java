@@ -1,9 +1,13 @@
 package entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 import terrain.TerrainMap;
 
+@Getter
+@AllArgsConstructor
 public class Camera {
     private Vector3f position = new Vector3f(0,0,0);
     private float pitch;
@@ -84,22 +88,6 @@ public class Camera {
         position.x = playerPosition.getPosition().x - offsetX;
         position.z = playerPosition.getPosition().z - offsetZ;
         position.y = playerPosition.getPosition().y + verticalDistance + playerHeightOffset;  // add player height
-    }
-
-    public Vector3f getPosition() {
-        return position;
-    }
-
-    public float getPitch() {
-        return pitch;
-    }
-
-    public float getYaw() {
-        return yaw;
-    }
-
-    public float getRoll() {
-        return roll;
     }
 
     public void invertPitch() {
