@@ -25,7 +25,7 @@ public class MasterRenderer {
 
     public static final float FOV = 70;
     public static final float NEAR_PLANE = 0.1f;  // if changing these,
-    public static final float FAR_PLANE = 1000;  // adjust change sky box size and waterFragment near/far planes too
+    public static final float FAR_PLANE = 5000;  // adjust change sky box size and waterFragment near/far planes too
     private static float SKY_RED;
     private static float SKY_GREEN;
     private static float SKY_BLUE;

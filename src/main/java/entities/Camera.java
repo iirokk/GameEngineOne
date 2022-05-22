@@ -9,17 +9,16 @@ import terrain.TerrainMap;
 @Getter
 @AllArgsConstructor
 public class Camera {
-    private Vector3f position = new Vector3f(0,0,0);
+    private Vector3f position = new Vector3f(0, 0, 0);
     private float pitch;
     private float yaw;
     private float roll;
     private PlayerPosition playerPosition;
     private float distanceFromPlayer = 50;
-    private final float playerHeightOffset = 6;
     private final TerrainMap terrainMap;
-    private final float minimumCameraHeight = 5f;
-    private final float maxCameraDistance = 125f;
-    private final float minCameraDistance = 20f;
+    private final float minimumCameraHeight = 10f;
+    private final float maxCameraDistance = 500f;
+    private final float minCameraDistance = 100f;
 
     public Camera(PlayerPosition playerPosition, TerrainMap terrainMap) {
         this.playerPosition = playerPosition;
@@ -27,14 +26,15 @@ public class Camera {
     }
 
     public void move() {
+        playerPosition.setMovementSpeed(distanceFromPlayer * 0.5f);
         calculateZoom();
         calculatePitch();
         calculateAngleAroundPlayer();
         float horizontalDistance = calculateHorizontalDistance();
         float verticalDistance = calculateVerticalDistance();
         calculateCameraPosition(horizontalDistance, verticalDistance);
-        float minimumCameraY = terrainMap.getHeightOfTerrain(position.x, position.z) + minimumCameraHeight * distanceFromPlayer/50;
-        if (position.y < terrainMap.getHeightOfTerrain(position.x, position.z) + minimumCameraHeight * distanceFromPlayer/50) {
+        float minimumCameraY = terrainMap.getHeightOfTerrain(position.x, position.z) + minimumCameraHeight * distanceFromPlayer / 50;
+        if (position.y < terrainMap.getHeightOfTerrain(position.x, position.z) + minimumCameraHeight * distanceFromPlayer / 50) {
             position.y = minimumCameraY;
         }
         this.yaw = 180 - (playerPosition.getRotY());
@@ -42,10 +42,11 @@ public class Camera {
 
     private void calculateZoom() {
         float zoomLevel = Mouse.getDWheel();
+        float zoomSpeed = 0.05f;  // TODO: distance based zoom speed, zoom smoothing
         if (zoomLevel > 0) {
-            distanceFromPlayer = distanceFromPlayer*0.95f;
+            distanceFromPlayer = distanceFromPlayer * (1f - zoomSpeed);
         } else if (zoomLevel < 0) {
-            distanceFromPlayer = distanceFromPlayer*1.05f;
+            distanceFromPlayer = distanceFromPlayer * (1f + zoomSpeed);
         }
         if (distanceFromPlayer < minCameraDistance) {
             distanceFromPlayer = minCameraDistance;
@@ -55,19 +56,19 @@ public class Camera {
     }
 
     private void calculatePitch() {
-        if(Mouse.isButtonDown(1)) {
+        if (Mouse.isButtonDown(1)) {
             float pitchChange = Mouse.getDY() * 0.1f;
             pitch -= pitchChange;
         }
         if (pitch > 75) {
             pitch = 75;
-        } else if (pitch < -75) {
-            pitch = -75;
+        } else if (pitch < 0) {
+            pitch = -0;
         }
     }
 
     private void calculateAngleAroundPlayer() {
-        if(Mouse.isButtonDown(1)) {
+        if (Mouse.isButtonDown(1)) {
             float angleChange = Mouse.getDX() * 0.3f;
             playerPosition.setRotY(playerPosition.getRotY() - angleChange);
         }
@@ -87,7 +88,7 @@ public class Camera {
         float offsetZ = (float) (horizontalDistance * Math.cos(Math.toRadians(theta)));
         position.x = playerPosition.getPosition().x - offsetX;
         position.z = playerPosition.getPosition().z - offsetZ;
-        position.y = playerPosition.getPosition().y + verticalDistance + playerHeightOffset;  // add player height
+        position.y = playerPosition.getPosition().y + verticalDistance;
     }
 
     public void invertPitch() {

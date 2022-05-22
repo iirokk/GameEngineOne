@@ -11,7 +11,7 @@ import renderEngine.Loader;
 
 public class SkyboxRenderer {
 
-    private static final float SIZE = 550f;  // max 1/3^(1/2) * FAR_PLANE from MasterRenderer class
+    private static final float SIZE = 1000f;  // max 1/3^(1/2) * FAR_PLANE from MasterRenderer class
 
     private static final float[] VERTICES = {
             -SIZE,  SIZE, -SIZE,

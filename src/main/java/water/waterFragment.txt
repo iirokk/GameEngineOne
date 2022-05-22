@@ -20,7 +20,7 @@ const float shineDamper = 30.0;
 const float reflectivity = 0.5;
 const float waterDepthVisibility = 5.0;
 const float nearPlane = 0.1;
-const float farPlane = 1000f;
+const float farPlane = 5000f;
 
 void main(void) {
 

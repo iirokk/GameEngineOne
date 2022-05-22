@@ -8,17 +8,20 @@ import water.WaterTile;
 public class TerrainLoader {
 
     private final Loader loader;
-    private final int gridSize = 8;
+    private final int worldGridSize = 8;
+    private final int terrainSquareResolution = 16;
+    private final TerrainSquareGenerator terrainSquareGenerator;
 
     public TerrainLoader(Loader loader) {
         this.loader = loader;
+        this.terrainSquareGenerator = new TerrainSquareGenerator();
     }
 
     public TerrainMap generateTerrainMap() {
         TerrainMap terrainMap = new TerrainMap();
         TerrainTexturePack texturePack = loadTerrainTexturePack();
-        for (int gridX = 0; gridX < gridSize; gridX++) {
-            for (int gridY = 0; gridY < gridSize; gridY++) {
+        for (int gridX = 0; gridX < worldGridSize; gridX++) {
+            for (int gridY = 0; gridY < worldGridSize; gridY++) {
                 terrainMap.addTerrain(loadTerrainTile(texturePack, gridX, gridY));
             }
         }
@@ -42,18 +45,17 @@ public class TerrainLoader {
 
     private Terrain loadTerrainTile(TerrainTexturePack texturePack, int gridX, int gridY) {
         String blendMapFile = "blendMap";
-        int gridID = getTerrainID(gridX, gridY);
-        String heightMapFile = "terrain/heightmap/image_part_" + String.format("%3s", gridID).replace(' ', '0');
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(blendMapFile));
-        return new Terrain(gridX, gridY, loader, texturePack, blendMap, heightMapFile);
-    }
 
-    private int getTerrainID(int gridX, int gridY) {
-        return (gridSize - gridX - 1) * 16 + gridY + 1;
+        // TODO: instead of image, generate random smoothed terrain here
+        // TODO: make camera move speed zoom level dependent -> higher view, faster camera
+
+        TerrainSquareArray terrainArray = terrainSquareGenerator.generateTerrainSquare(terrainSquareResolution);
+
+        return new Terrain(gridX, gridY, loader, texturePack, blendMap, terrainArray);
     }
 
     private WaterTile loadWaterTile() {
-        WaterTile waterTile = new WaterTile(175, -175, -1.5f);
-        return waterTile;
+        return new WaterTile(175, -175, 0);
     }
 }

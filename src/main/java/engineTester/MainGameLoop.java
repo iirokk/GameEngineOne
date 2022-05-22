@@ -80,11 +80,11 @@ public class MainGameLoop {
         texture1.setHasTransparency(true);
         texture1.setNumberOfRows(2);
 
-        ModelData modelData2 = OBJFileLoader.loadOBJ("gameModels/dead_tree");
+        ModelData modelData2 = OBJFileLoader.loadOBJ("gameModels/house1");
         RawModel model2 = loader.loadToVAO(modelData2.getVertices(), modelData2.getTextureCoords(), modelData2.getNormals(),
                 modelData2.getIndices());
         TexturedModel texturedModel2 = new TexturedModel(model2,
-                new ModelTexture(loader.loadTexture("ground_tex")));
+                new ModelTexture(loader.loadTexture("texture/stone")));
         ModelTexture texture2 = texturedModel2.getTexture();
         texture2.setShineDamper(5);
         texture2.setReflectivity(0.1f);
