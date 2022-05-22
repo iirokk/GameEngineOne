@@ -20,8 +20,6 @@ import java.io.IOException;
 @Setter
 public class Terrain {
     public static final float SIZE = 800;
-    private static final float MAX_HEIGHT = 20;
-    private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 
     private float x;
     private float z;
@@ -29,13 +27,11 @@ public class Terrain {
     private int gridZ;
     private RawModel model;
     private TerrainTexturePack texturePack;
-    private TerrainTexture blendMap;
     private float[][] heights;
     private boolean isRendered = false;
 
-    public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap, String heightMap) {
+    public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, String heightMap) {
         this.texturePack = texturePack;
-        this.blendMap = blendMap;
         this.x = gridX * SIZE;
         this.z = gridZ * SIZE;
         this.model = createTerrainFromHeightmap(loader, heightMap);
@@ -43,9 +39,8 @@ public class Terrain {
         this.gridZ = gridZ;
     }
 
-    public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap, TerrainSquareArray terrainArray) {
+    public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainSquareArray terrainArray) {
         this.texturePack = texturePack;
-        this.blendMap = blendMap;
         this.x = gridX * SIZE;
         this.z = gridZ * SIZE;
         this.model = createTerrain(loader, terrainArray);
@@ -61,6 +56,7 @@ public class Terrain {
         float[] vertices = new float[count * 3];
         float[] normals = new float[count * 3];
         float[] textureCoords = new float[count*2];
+        float[] textureBlendColor = new float[count * 3];
         int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
         int vertexPointer = 0;
 
@@ -77,6 +73,12 @@ public class Terrain {
                 normals[vertexPointer*3+2] = normal.z;
                 textureCoords[vertexPointer*2] = (float)j/((float)VERTEX_COUNT - 1);
                 textureCoords[vertexPointer*2+1] = (float)i/((float)VERTEX_COUNT - 1);
+
+                float[] terrainBlendColor = getTerrainBlendColor(i, j, terrainArray);
+                textureBlendColor[vertexPointer*3] = terrainBlendColor[0];
+                textureBlendColor[vertexPointer*3+1] = terrainBlendColor[1];
+                textureBlendColor[vertexPointer*3+2] = terrainBlendColor[2];
+
                 vertexPointer++;
             }
         }
@@ -95,7 +97,7 @@ public class Terrain {
                 indices[pointer++] = bottomRight;
             }
         }
-        return loader.loadToVAO(vertices, textureCoords, normals, indices);
+        return loader.loadToVAO(vertices, textureCoords, normals, indices, textureBlendColor);
     }
 
     private RawModel createTerrainFromHeightmap(Loader loader, String heightMap){
@@ -160,5 +162,35 @@ public class Terrain {
                     new Vector3f(0, heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
         }
         return pointHeight;
+    }
+
+    private float[] getTerrainBlendColor(int x, int z, TerrainSquareArray terrainSquareArray) {
+        float terrainHeight = terrainSquareArray.getTerrainHeight(x, z);
+
+        float[] terrainBlendColor = new float[3];
+
+        // texture 1 (gravel)
+        // texture 2 (sand)
+        // texture 3 (stone)
+        if (terrainHeight < -2) {
+            terrainBlendColor[0] = 1f;
+            terrainBlendColor[1] = 0f;
+            terrainBlendColor[2] = 0f;
+
+        } else if (terrainHeight < 0) {
+            terrainBlendColor[0] = 0f;
+            terrainBlendColor[1] = 1f;
+            terrainBlendColor[2] = 0f;
+        } else if (terrainHeight < 100) {
+            terrainBlendColor[0] = 0f;
+            terrainBlendColor[1] = 0f;
+            terrainBlendColor[2] = 0f;
+        } else {
+            terrainBlendColor[0] = 0f;
+            terrainBlendColor[1] = 0f;
+            terrainBlendColor[2] = 1f;
+        }
+
+        return terrainBlendColor;
     }
 }

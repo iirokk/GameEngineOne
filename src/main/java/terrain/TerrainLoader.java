@@ -31,10 +31,10 @@ public class TerrainLoader {
     }
 
     private TerrainTexturePack loadTerrainTexturePack() {
-        String backgroundTexture1 = "grassy2";
-        String rTexture1 = "mud";
-        String gTexture1 = "grassFlowers";
-        String bTexture1 = "ground_tex";
+        String backgroundTexture1 = "texture/grass";
+        String rTexture1 = "texture/gravel";
+        String gTexture1 = "texture/sand";
+        String bTexture1 = "texture/stone";
 
         TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture(backgroundTexture1));
         TerrainTexture rTexture = new TerrainTexture(loader.loadTexture(rTexture1));
@@ -44,18 +44,12 @@ public class TerrainLoader {
     }
 
     private Terrain loadTerrainTile(TerrainTexturePack texturePack, int gridX, int gridY) {
-        String blendMapFile = "blendMap";
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(blendMapFile));
-
-        // TODO: instead of image, generate random smoothed terrain here
-        // TODO: make camera move speed zoom level dependent -> higher view, faster camera
-
         TerrainSquareArray terrainArray = terrainSquareGenerator.generateTerrainSquare(
                 terrainSquareResolution,
                 gridX * terrainSquareResolution,
                 gridX * terrainSquareResolution);
 
-        return new Terrain(gridX, gridY, loader, texturePack, blendMap, terrainArray);
+        return new Terrain(gridX, gridY, loader, texturePack, terrainArray);
     }
 
     private WaterTile loadWaterTile() {

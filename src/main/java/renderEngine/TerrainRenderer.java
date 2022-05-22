@@ -1,8 +1,6 @@
 package renderEngine;
 
-import entities.Entity;
 import models.RawModel;
-import models.TexturedModel;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -11,7 +9,6 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import shaders.TerrainShader;
 import terrain.Terrain;
-import textures.ModelTexture;
 import textures.TerrainTexturePack;
 import toolbox.Maths;
 
@@ -31,7 +28,7 @@ public class TerrainRenderer {
 
     public void render(List<Terrain> terrains, Matrix4f toShadowSpace) {
         shader.loadToShadowMapSpace(toShadowSpace);
-        for (Terrain terrain:terrains) {
+        for (Terrain terrain : terrains) {
             if (terrain.isRendered()) {
                 prepareTerrain(terrain);
                 loadModelMatrix(terrain);
@@ -48,6 +45,7 @@ public class TerrainRenderer {
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL20.glEnableVertexAttribArray(2);
+        GL20.glEnableVertexAttribArray(3);
         bindTextures(terrain);
         shader.loadShineVariables(1, 0);
     }
@@ -57,13 +55,11 @@ public class TerrainRenderer {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getBackgroundTexture().getTextureID());
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getrTexture().getTextureID());
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getRTexture().getTextureID());
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getgTexture().getTextureID());
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getGTexture().getTextureID());
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getbTexture().getTextureID());
-        GL13.glActiveTexture(GL13.GL_TEXTURE4);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, terrain.getBlendMap().getTextureID());
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getBTexture().getTextureID());
     }
 
     private void loadModelMatrix(Terrain terrain) {
@@ -76,6 +72,7 @@ public class TerrainRenderer {
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
         GL20.glDisableVertexAttribArray(2);
+        GL20.glDisableVertexAttribArray(3);
         GL30.glBindVertexArray(0);
     }
 }
