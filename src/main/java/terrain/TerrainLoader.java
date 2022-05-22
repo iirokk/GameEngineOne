@@ -50,7 +50,10 @@ public class TerrainLoader {
         // TODO: instead of image, generate random smoothed terrain here
         // TODO: make camera move speed zoom level dependent -> higher view, faster camera
 
-        TerrainSquareArray terrainArray = terrainSquareGenerator.generateTerrainSquare(terrainSquareResolution);
+        TerrainSquareArray terrainArray = terrainSquareGenerator.generateTerrainSquare(
+                terrainSquareResolution,
+                gridX * terrainSquareResolution,
+                gridX * terrainSquareResolution);
 
         return new Terrain(gridX, gridY, loader, texturePack, blendMap, terrainArray);
     }
