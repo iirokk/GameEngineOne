@@ -2,14 +2,11 @@ package terrain;
 
 import water.WaterTile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class TerrainMap {
-    private static Map<String, Terrain> terrains;
+    private static Map<TerrainPosition, Terrain> terrains;
     private static List<WaterTile> waterTiles;
 
     public TerrainMap() {
@@ -18,8 +15,11 @@ public class TerrainMap {
     }
 
     public void addTerrain(Terrain terrain) {
-        String key = terrain.getGridX() + ":" + terrain.getGridZ();
-        terrains.put(key, terrain);
+        terrains.put(new TerrainPosition(terrain.getGridX(), terrain.getGridZ()), terrain);
+    }
+
+    public void addWaterTile(WaterTile waterTile) {
+        waterTiles.add(waterTile);
     }
 
     public void updateRenderedTerrains(float worldX, float worldZ) {
@@ -31,36 +31,32 @@ public class TerrainMap {
         for (Terrain terrain:renderedTerrains) {
             terrain.setRendered(true);
         }
+        waterTiles.get(0).setPosition(worldX, worldZ);
     }
 
-    public void addWaterTile(WaterTile waterTile) {
-        waterTiles.add(waterTile);
-    }
-
-    public static int[] getTerrainGridPosition(float worldX, float worldZ) {
-        int[] terrainGridXY = new int[2];
-        terrainGridXY[0] = (int) Math.floor(worldX / Terrain.SIZE);  //terrainPositionX
-        terrainGridXY[1] = (int) Math.floor(worldZ / Terrain.SIZE);  //terrainPositionZ
-        return terrainGridXY;
+    public static TerrainPosition getTerrainGridPosition(float worldX, float worldZ) {
+        int gridX = (int) Math.floor(worldX / Terrain.SIZE);  //terrainPositionX
+        int gridZ =  (int) Math.floor(worldZ / Terrain.SIZE);  //terrainPositionZ
+        return new TerrainPosition(gridX, gridZ);
     }
 
     private static Terrain getTerrainOfPosition(float worldX, float worldZ) {
-        int[] gridXY = getTerrainGridPosition(worldX, worldZ);
-        return terrains.get(gridXY[0] + ":" + gridXY[1]);
+        getTerrainGridPosition(worldX, worldZ);
+        return terrains.get(getTerrainGridPosition(worldX, worldZ));
     }
 
     private static List<Terrain> getRenderedTerrainsOfPosition(float worldX, float worldZ) {
-        int[] gridXZ = getTerrainGridPosition(worldX, worldZ);
-        List<Terrain> renderedTerrains = new ArrayList<>();
-        for (int dX = -1; dX < 2; dX++) {
-            for (int dY = -1; dY < 2; dY++) {
-                Terrain terrain = terrains.get((gridXZ[0]+dX) + ":" + (gridXZ[1]+dY));
+        Set<Terrain> renderedTerrainsSet = new HashSet<>();
+        TerrainPosition terrainGridPosition = getTerrainGridPosition(worldX, worldZ);
+        for (int dX = -1; dX <= 1; dX++) {
+            for (int dY = -1; dY <= 1; dY++) {
+                Terrain terrain = terrains.get(new TerrainPosition(terrainGridPosition.getGridX() + dX, terrainGridPosition.getGridZ() + dY));
                 if (terrain != null) {
-                    renderedTerrains.add(terrain);
+                    renderedTerrainsSet.add(terrain);
                 }
             }
         }
-        return renderedTerrains;
+        return new ArrayList<>(renderedTerrainsSet);
     }
 
     public float getHeightOfTerrain(float worldX, float worldZ) {

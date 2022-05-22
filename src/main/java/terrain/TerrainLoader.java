@@ -8,7 +8,7 @@ import water.WaterTile;
 public class TerrainLoader {
 
     private final Loader loader;
-    private final int worldGridSize = 8;
+    private final int worldGridSize = 2;
     private final int terrainSquareResolution = 16;
     private final TerrainSquareGenerator terrainSquareGenerator;
 
@@ -21,8 +21,8 @@ public class TerrainLoader {
         TerrainMap terrainMap = new TerrainMap();
         TerrainTexturePack texturePack = loadTerrainTexturePack();
         for (int gridX = 0; gridX < worldGridSize; gridX++) {
-            for (int gridY = 0; gridY < worldGridSize; gridY++) {
-                terrainMap.addTerrain(loadTerrainTile(texturePack, gridX, gridY));
+            for (int gridZ = 0; gridZ < worldGridSize; gridZ++) {
+                terrainMap.addTerrain(loadTerrainTile(texturePack, gridX, gridZ));
             }
         }
         terrainMap.addWaterTile(loadWaterTile());
@@ -43,16 +43,12 @@ public class TerrainLoader {
         return new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
     }
 
-    private Terrain loadTerrainTile(TerrainTexturePack texturePack, int gridX, int gridY) {
-        TerrainSquareArray terrainArray = terrainSquareGenerator.generateTerrainSquare(
-                terrainSquareResolution,
-                gridX * terrainSquareResolution,
-                gridX * terrainSquareResolution);
-
-        return new Terrain(gridX, gridY, loader, texturePack, terrainArray);
+    private Terrain loadTerrainTile(TerrainTexturePack texturePack, int gridX, int gridZ) {
+        TerrainSquareArray terrainArray = terrainSquareGenerator.generateTerrainSquare(terrainSquareResolution);
+        return new Terrain(gridX, gridZ, loader, texturePack, terrainArray);
     }
 
     private WaterTile loadWaterTile() {
-        return new WaterTile(175, -175, 0);
+        return new WaterTile(0, 0, 0);
     }
 }

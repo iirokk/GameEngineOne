@@ -1,5 +1,6 @@
 package terrain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import models.RawModel;
@@ -18,6 +19,7 @@ import java.io.IOException;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Terrain {
     public static final float SIZE = 800;
 
@@ -74,7 +76,7 @@ public class Terrain {
                 textureCoords[vertexPointer*2] = (float)j/((float)VERTEX_COUNT - 1);
                 textureCoords[vertexPointer*2+1] = (float)i/((float)VERTEX_COUNT - 1);
 
-                float[] terrainBlendColor = getTerrainBlendColor(i, j, terrainArray);
+                float[] terrainBlendColor = getTerrainBlendColor(i, VERTEX_COUNT - j - 1, terrainArray);
                 textureBlendColor[vertexPointer*3] = terrainBlendColor[0];
                 textureBlendColor[vertexPointer*3+1] = terrainBlendColor[1];
                 textureBlendColor[vertexPointer*3+2] = terrainBlendColor[2];
@@ -118,18 +120,24 @@ public class Terrain {
         return new SquareArray(imageTerrain);
     }
 
-    private float getHeight(int x, int z, TerrainSquareArray imageTerrain) {
+    private Float getHeight(int x, int z, TerrainSquareArray imageTerrain) {
         if (x < 0 || x >= imageTerrain.getSize() || z < 0 || z >= imageTerrain.getSize()) {
-            return 0;
+            return null;
         }
         return imageTerrain.getTerrainHeight(x, z);
     }
 
     private Vector3f calculateNormal(int x, int z, TerrainSquareArray image) {
-        float heightL = getHeight(x-1, z, image);
-        float heightR = getHeight(x+1, z, image);
-        float heightD = getHeight(x, z-1, image);
-        float heightU = getHeight(x, z+1, image);
+        Float heightL = getHeight(x-1, z, image);
+        Float heightR = getHeight(x+1, z, image);
+        Float heightD = getHeight(x, z-1, image);
+        Float heightU = getHeight(x, z+1, image);
+
+        // ignore nulls when possible to avoid weird normals at edges
+        heightL = heightL == null ? heightR : heightL;
+        heightR = heightR == null ? heightL : heightR;
+        heightD = heightD == null ? heightU : heightD;
+        heightU = heightU == null ? heightD : heightU;
         Vector3f normal = new Vector3f(heightL-heightR, 2f, heightD-heightU);
         normal.normalise();
         return normal;
@@ -178,8 +186,12 @@ public class Terrain {
             terrainBlendColor[2] = 0f;
 
         } else if (terrainHeight < 0) {
-            terrainBlendColor[0] = 0f;
-            terrainBlendColor[1] = 1f;
+            terrainBlendColor[0] = 0.5f;
+            terrainBlendColor[1] = 0.5f;
+            terrainBlendColor[2] = 0f;
+        } else if (terrainHeight < 2) {
+            terrainBlendColor[0] = 0.2f;
+            terrainBlendColor[1] = 0.8f;
             terrainBlendColor[2] = 0f;
         } else if (terrainHeight < 100) {
             terrainBlendColor[0] = 0f;
