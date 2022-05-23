@@ -58,7 +58,7 @@ public class MainGameLoop {
 
         // Terrain
         TerrainLoader terrainLoader = new TerrainLoader(loader);
-        TerrainMap terrainMap = terrainLoader.generateTerrainMap();
+        TerrainMap terrainMap = terrainLoader.createTerrainFromHeightmap("hmap_river");
 
         // Water
         List<WaterTile> waterTiles = terrainMap.getWaterTiles();
@@ -215,7 +215,7 @@ public class MainGameLoop {
             // Render GUI & texts
             guiRenderer.render(guiTextures);
             TextMaster.updateTextString(textFPS, "FPS: " + Math.round(1 / DisplayManager.getFrameTimeSeconds()));
-            TextMaster.updateTextString(debugText, "xyz: " + camera.getPosition());
+            TextMaster.updateTextString(debugText, "xyz: " + playerPosition.getPosition());
             TextMaster.render();
 
             DisplayManager.updateDisplay();
@@ -248,7 +248,7 @@ public class MainGameLoop {
     private static Vector3f calculateSunPosition(float timeOfDay) {
         // y upward, x east-west, z north-south
         float dayFraction = (timeOfDay - 12) / 12;
-        float yPosition = (float) (Math.cos(Math.PI * dayFraction) + 1) / 2 * 1500000;
+        float yPosition = (float) (Math.cos(Math.PI * dayFraction) + 1) / 2 * 15000000;
         float zPosition = (float) -(Math.cos(Math.PI * dayFraction) + 0.5) / 2 * 2000000;
         float xPosition = (float) (Math.cos(Math.PI * dayFraction)) / 16 * 2000000;
 

@@ -16,7 +16,7 @@ import java.util.List;
 
 public class TerrainRenderer {
 
-    private TerrainShader shader;
+    private final TerrainShader shader;
 
     public TerrainRenderer(TerrainShader shader, Matrix4f projectionMatrix) {
         this.shader = shader;
@@ -34,13 +34,29 @@ public class TerrainRenderer {
                 loadModelMatrix(terrain);
                 GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(),
                         GL11.GL_UNSIGNED_INT, 0);
-                unbindTexturedModel();
+            } else {
+                prepareLodTerrain(terrain);
+                loadModelMatrix(terrain);
+                GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getLowDetailModel().getVertexCount(),
+                        GL11.GL_UNSIGNED_INT, 0);
             }
+            unbindTexturedModel();
         }
     }
 
     private void prepareTerrain(Terrain terrain) {
         RawModel model = terrain.getModel();
+        GL30.glBindVertexArray(model.getVaoID());
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
+        GL20.glEnableVertexAttribArray(2);
+        GL20.glEnableVertexAttribArray(3);
+        bindTextures(terrain);
+        shader.loadShineVariables(1, 0);
+    }
+
+    private void prepareLodTerrain(Terrain terrain) {
+        RawModel model = terrain.getLowDetailModel();
         GL30.glBindVertexArray(model.getVaoID());
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);

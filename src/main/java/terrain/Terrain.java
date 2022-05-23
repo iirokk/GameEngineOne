@@ -16,38 +16,48 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.DoubleSummaryStatistics;
+import java.util.IntSummaryStatistics;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @EqualsAndHashCode
 public class Terrain {
-    public static final float SIZE = 800;
+    public static final float SIZE = 500;
 
     private float x;
     private float z;
     private int gridX;
     private int gridZ;
     private RawModel model;
+    private RawModel lowDetailModel;
     private TerrainTexturePack texturePack;
     private float[][] heights;
     private boolean isRendered = false;
-
-    public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, String heightMap) {
-        this.texturePack = texturePack;
-        this.x = gridX * SIZE;
-        this.z = gridZ * SIZE;
-        this.model = createTerrainFromHeightmap(loader, heightMap);
-        this.gridX = gridX;
-        this.gridZ = gridZ;
-    }
 
     public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainSquareArray terrainArray) {
         this.texturePack = texturePack;
         this.x = gridX * SIZE;
         this.z = gridZ * SIZE;
         this.model = createTerrain(loader, terrainArray);
+        this.lowDetailModel = createLowDetailTerrain(loader, terrainArray);
         this.gridX = gridX;
         this.gridZ = gridZ;
+    }
+
+    public float lowestPointHeight() {
+        double lowest = heights[0][0];
+        for (int r = 1; r < heights.length; r++){
+            for (int c = 1; c < heights.length; c++){
+                if (heights[r][c] < lowest){
+                    lowest = heights[r][c];
+                }
+            }
+        }
+        return (float) lowest;
     }
 
     private RawModel createTerrain(Loader loader, TerrainSquareArray terrainArray){
@@ -102,22 +112,56 @@ public class Terrain {
         return loader.loadToVAO(vertices, textureCoords, normals, indices, textureBlendColor);
     }
 
-    private RawModel createTerrainFromHeightmap(Loader loader, String heightMap){
-        TerrainSquareArray terrainArray = (TerrainSquareArray) getBufferedImageHeightmap(heightMap);
-        return this.createTerrain(loader, terrainArray);
-    }
+    private RawModel createLowDetailTerrain(Loader loader, TerrainSquareArray terrainArray){
+        int VERTEX_COUNT = terrainArray.getSize();
+        heights = new float[VERTEX_COUNT][VERTEX_COUNT];
 
-    private SquareArray getBufferedImageHeightmap(String heightMap) {
-        BufferedImage imageTerrain = null;
-        try {
-            imageTerrain = ImageIO.read(new File("res/" + heightMap + ".png"));
-        } catch (IOException e) {
-            e.printStackTrace();
+        int count = VERTEX_COUNT * VERTEX_COUNT;
+        float[] vertices = new float[count * 3];
+        float[] normals = new float[count * 3];
+        float[] textureCoords = new float[count*2];
+        float[] textureBlendColor = new float[count * 3];
+        int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
+        int vertexPointer = 0;
+
+        for(int i=0;i<VERTEX_COUNT;i++){
+            for(int j=0;j<VERTEX_COUNT;j++){
+                vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * SIZE;
+                float height = getHeight(i, VERTEX_COUNT - j - 1, terrainArray);
+                heights[j][i] = height;
+                vertices[vertexPointer*3+1] = height;
+                vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * SIZE;
+                Vector3f normal = calculateNormal(i, VERTEX_COUNT - j - 1, terrainArray);
+                normals[vertexPointer*3] = normal.x;
+                normals[vertexPointer*3+1] = normal.y;
+                normals[vertexPointer*3+2] = normal.z;
+                textureCoords[vertexPointer*2] = (float)j/((float)VERTEX_COUNT - 1);
+                textureCoords[vertexPointer*2+1] = (float)i/((float)VERTEX_COUNT - 1);
+
+                float[] terrainBlendColor = getTerrainBlendColor(i, VERTEX_COUNT - j - 1, terrainArray);
+                textureBlendColor[vertexPointer*3] = terrainBlendColor[0];
+                textureBlendColor[vertexPointer*3+1] = terrainBlendColor[1];
+                textureBlendColor[vertexPointer*3+2] = terrainBlendColor[2];
+
+                vertexPointer++;
+            }
         }
-        if (imageTerrain == null) {
-            throw new RuntimeException("Null imageTerrain from BufferedImage.");
+        int pointer = 0;
+        for(int gz=0;gz<VERTEX_COUNT-1;gz++){
+            for(int gx=0;gx<VERTEX_COUNT-1;gx++){
+                int topLeft = (gz*VERTEX_COUNT)+gx;
+                int topRight = topLeft + 1;
+                int bottomLeft = ((gz+1)*VERTEX_COUNT)+gx;
+                int bottomRight = bottomLeft + 1;
+                indices[pointer++] = topLeft;
+                indices[pointer++] = bottomLeft;
+                indices[pointer++] = topRight;
+                indices[pointer++] = topRight;
+                indices[pointer++] = bottomLeft;
+                indices[pointer++] = bottomRight;
+            }
         }
-        return new SquareArray(imageTerrain);
+        return loader.loadToVAO(vertices, textureCoords, normals, indices, textureBlendColor);
     }
 
     private Float getHeight(int x, int z, TerrainSquareArray imageTerrain) {

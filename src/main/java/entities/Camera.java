@@ -26,7 +26,7 @@ public class Camera {
     }
 
     public void move() {
-        playerPosition.setMovementSpeed(distanceFromPlayer * 0.5f);
+        playerPosition.setMovementSpeed((float) Math.pow(distanceFromPlayer * 0.2f, 1.5));
         calculateZoom();
         calculatePitch();
         calculateAngleAroundPlayer();

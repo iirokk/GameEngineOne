@@ -6,6 +6,8 @@ import java.util.*;
 
 
 public class TerrainMap {
+    private static int RENDERED_TERRAINS_RANGE = 2;
+
     private static Map<TerrainPosition, Terrain> terrains;
     private static List<WaterTile> waterTiles;
 
@@ -16,14 +18,16 @@ public class TerrainMap {
 
     public void addTerrain(Terrain terrain) {
         terrains.put(new TerrainPosition(terrain.getGridX(), terrain.getGridZ()), terrain);
-    }
 
-    public void addWaterTile(WaterTile waterTile) {
-        waterTiles.add(waterTile);
+        float halfTerrainSize = Terrain.SIZE / 2;
+        if (terrain.lowestPointHeight() < 0) {
+            waterTiles.add(new WaterTile(halfTerrainSize, 0, terrain.getX() + halfTerrainSize, terrain.getZ() + halfTerrainSize));
+        }
     }
 
     public void updateRenderedTerrains(float worldX, float worldZ) {
         // set only adjacent terrains for rendering
+        // TODO: render only relevant water tiles
         for (Terrain terrain:getAllTerrains()) {
             terrain.setRendered(false);
         }
@@ -31,7 +35,6 @@ public class TerrainMap {
         for (Terrain terrain:renderedTerrains) {
             terrain.setRendered(true);
         }
-        waterTiles.get(0).setPosition(worldX, worldZ);
     }
 
     public static TerrainPosition getTerrainGridPosition(float worldX, float worldZ) {
@@ -48,8 +51,8 @@ public class TerrainMap {
     private static List<Terrain> getRenderedTerrainsOfPosition(float worldX, float worldZ) {
         Set<Terrain> renderedTerrainsSet = new HashSet<>();
         TerrainPosition terrainGridPosition = getTerrainGridPosition(worldX, worldZ);
-        for (int dX = -1; dX <= 1; dX++) {
-            for (int dY = -1; dY <= 1; dY++) {
+        for (int dX = -RENDERED_TERRAINS_RANGE; dX <= RENDERED_TERRAINS_RANGE; dX++) {
+            for (int dY = -RENDERED_TERRAINS_RANGE; dY <= RENDERED_TERRAINS_RANGE; dY++) {
                 Terrain terrain = terrains.get(new TerrainPosition(terrainGridPosition.getGridX() + dX, terrainGridPosition.getGridZ() + dY));
                 if (terrain != null) {
                     renderedTerrainsSet.add(terrain);

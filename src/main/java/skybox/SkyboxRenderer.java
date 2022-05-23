@@ -9,9 +9,11 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import renderEngine.Loader;
 
+import static org.lwjgl.opengl.GL11.*;
+
 public class SkyboxRenderer {
 
-    private static final float SIZE = 1000f;  // max 1/3^(1/2) * FAR_PLANE from MasterRenderer class
+    private static final float SIZE = 3000f;  // max 1/3^(1/2) * FAR_PLANE from MasterRenderer class
 
     private static final float[] VERTICES = {
             -SIZE,  SIZE, -SIZE,
@@ -79,12 +81,14 @@ public class SkyboxRenderer {
         shader.start();
         shader.loadViewMatrix(camera);
         shader.loadFogColor(rFog, gFog, bFog);
+        glDisable(GL_DEPTH_TEST);
         GL30.glBindVertexArray(cube.getVaoID());
         GL20.glEnableVertexAttribArray(0);
         bindTextures(blendFactor);
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, cube.getVertexCount());
         GL20.glDisableVertexAttribArray(0);
         GL30.glBindVertexArray(0);
+        glEnable(GL_DEPTH_TEST);
         shader.stop();
     }
 

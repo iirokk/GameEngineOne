@@ -33,9 +33,9 @@ public class MasterRenderer {
     private static final float nightSkyRed = 0.01f;
     private static final float nightSkyGreen = 0.03f;
     private static final float nightSkyBlue = 0.03f;
-    private static final float daySkyRed = 0.48f;
-    private static final float daySkyGreen = 0.61f;
-    private static final float daySkyBlue = 0.70f;
+    private static final float daySkyRed = 0.5f;
+    private static final float daySkyGreen = 0.6f;
+    private static final float daySkyBlue = 0.6f;
 
     private Matrix4f projectionMatrix;
     private StaticShader shader = new StaticShader();
@@ -71,6 +71,8 @@ public class MasterRenderer {
     public void render(List<Light> lights, Camera camera, float dayNightBlendFactor, Vector4f clippingPlane){
         calculateSkyColor(dayNightBlendFactor);
         prepare();
+        skyboxRenderer.render(camera, SKY_RED, SKY_GREEN, SKY_BLUE, dayNightBlendFactor);
+
         shader.start();
         shader.loadClippingPlane(clippingPlane);
         shader.loadSkyColor(SKY_RED, SKY_GREEN, SKY_BLUE);
@@ -86,7 +88,6 @@ public class MasterRenderer {
         terrainShader.loadShadowDistance(shadowRenderer.getShadowDistance());
         terrainRenderer.render(terrains, shadowRenderer.getToShadowMapSpaceMatrix());
         terrainShader.stop();
-        skyboxRenderer.render(camera, SKY_RED, SKY_GREEN, SKY_BLUE, dayNightBlendFactor);
         terrains.clear();
         entities.clear();
     }
