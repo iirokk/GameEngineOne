@@ -9,6 +9,7 @@ import water.WaterTile;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,8 +18,8 @@ public class TerrainLoader {
     private final Loader loader;
     private final int worldGridSize = 32;
     private final int terrainSquareResolution = 64;
-    private final float TERRAIN_HEIGHT_MULTIPLIER = 0.2f;
-    private final float TERRAIN_HEIGHT_MODIFIER = -20f;
+    private final float TERRAIN_HEIGHT_MULTIPLIER = 0.02f;
+    private final float TERRAIN_HEIGHT_MODIFIER = -50f;
 
     public TerrainLoader(Loader loader) {
         this.loader = loader;
@@ -76,10 +77,10 @@ public class TerrainLoader {
             throw new RuntimeException(String.format("Can't create square array from image dimensions: %s, %s", image.getWidth(), image.getHeight()));
         }
         Float[][] array = new Float[image.getHeight()][image.getWidth()];
+        WritableRaster raster = image.getRaster();
         for (int i = 0; i < image.getHeight(); i++)
             for (int j = 0; j < image.getWidth(); j++) {
-                Color color = new Color(image.getRGB(i, j), false);
-                array[i][j] = (float) (color.getBlue() + color.getGreen() + color.getRed()) * TERRAIN_HEIGHT_MULTIPLIER + TERRAIN_HEIGHT_MODIFIER;
+                array[i][j] = raster.getSampleFloat(i,j,0) * TERRAIN_HEIGHT_MULTIPLIER + TERRAIN_HEIGHT_MODIFIER;
             }
         return new TerrainSquareArray(array);
     }

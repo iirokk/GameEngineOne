@@ -21,8 +21,8 @@ uniform vec4 clippingPlane;
 uniform mat4 toShadowMapSpace;
 uniform float shadowDistance;
 
-const float fogDensity = 0.00025;
-const float fogGradient = 10.0;
+const float fogDensity = 0.0001;
+const float fogGradient = 1.0;
 const float transitionDistance = 10.0;
 
 void main(void){

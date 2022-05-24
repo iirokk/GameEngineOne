@@ -7,6 +7,7 @@ import java.util.*;
 
 public class TerrainMap {
     private static int RENDERED_TERRAINS_RANGE = 2;
+    public static float WATER_LEVEL = 0f;
 
     private static Map<TerrainPosition, Terrain> terrains;
     private static List<WaterTile> waterTiles;
@@ -21,7 +22,7 @@ public class TerrainMap {
 
         float halfTerrainSize = Terrain.SIZE / 2;
         if (terrain.lowestPointHeight() < 0) {
-            waterTiles.add(new WaterTile(halfTerrainSize, 0, terrain.getX() + halfTerrainSize, terrain.getZ() + halfTerrainSize));
+            waterTiles.add(new WaterTile(halfTerrainSize, WATER_LEVEL, terrain.getX() + halfTerrainSize, terrain.getZ() + halfTerrainSize));
         }
     }
 

@@ -13,8 +13,4 @@ public class TerrainSquareArray extends SquareArray {
     public float getTerrainHeight(int x, int y) {
         return super.getArray()[x][y];
     }
-
-    public void setTerrainHeight(int x, int y, float height) {
-        super.getArray()[x][y] = height;
-    }
 }

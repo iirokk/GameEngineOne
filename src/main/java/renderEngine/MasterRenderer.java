@@ -24,18 +24,11 @@ import java.util.Map;
 public class MasterRenderer {
 
     public static final float FOV = 70;
-    public static final float NEAR_PLANE = 0.1f;  // if changing these,
-    public static final float FAR_PLANE = 5000;  // adjust change sky box size and waterFragment near/far planes too
-    private static float SKY_RED;
-    private static float SKY_GREEN;
-    private static float SKY_BLUE;
-
-    private static final float nightSkyRed = 0.01f;
-    private static final float nightSkyGreen = 0.03f;
-    private static final float nightSkyBlue = 0.03f;
-    private static final float daySkyRed = 0.5f;
-    private static final float daySkyGreen = 0.6f;
-    private static final float daySkyBlue = 0.6f;
+    public static final float NEAR_PLANE = 0.1f;  // if changing these,Butter
+    public static final float FAR_PLANE = 20000;  // adjust change sky box size and waterFragment near/far planes too
+    private static float SKY_RED = 0.6f;
+    private static float SKY_GREEN = 0.7f;
+    private static float SKY_BLUE = 0.7f;
 
     private Matrix4f projectionMatrix;
     private StaticShader shader = new StaticShader();
@@ -57,21 +50,19 @@ public class MasterRenderer {
         shadowRenderer = new ShadowMapMasterRenderer(camera);
     }
 
-    public void renderScene(List<Entity> entities, TerrainMap terrainMap, List<Light> lightSources, Camera camera,
-                            float dayNightBlendFactor, Vector4f clippingPlane) {
+    public void renderScene(List<Entity> entities, TerrainMap terrainMap, List<Light> lightSources, Camera camera, Vector4f clippingPlane) {
         for (Entity entity:entities) {
             processEntity(entity);
         }
         for (Terrain terrain:terrainMap.getAllTerrains()) {
             processTerrain(terrain);
         }
-        render(lightSources, camera, dayNightBlendFactor, clippingPlane);
+        render(lightSources, camera, clippingPlane);
     }
 
-    public void render(List<Light> lights, Camera camera, float dayNightBlendFactor, Vector4f clippingPlane){
-        calculateSkyColor(dayNightBlendFactor);
+    public void render(List<Light> lights, Camera camera, Vector4f clippingPlane){
         prepare();
-        skyboxRenderer.render(camera, SKY_RED, SKY_GREEN, SKY_BLUE, dayNightBlendFactor);
+        skyboxRenderer.render(camera, SKY_RED, SKY_GREEN, SKY_BLUE);
 
         shader.start();
         shader.loadClippingPlane(clippingPlane);
@@ -161,11 +152,5 @@ public class MasterRenderer {
 
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
-    }
-
-    private static void calculateSkyColor(float dayNightBlendFactor) {
-        SKY_RED = nightSkyRed * dayNightBlendFactor + (1 - dayNightBlendFactor) * daySkyRed;
-        SKY_GREEN = nightSkyGreen * dayNightBlendFactor + (1 - dayNightBlendFactor) * daySkyGreen;
-        SKY_BLUE = nightSkyBlue * dayNightBlendFactor + (1 - dayNightBlendFactor) * daySkyBlue;
     }
 }
