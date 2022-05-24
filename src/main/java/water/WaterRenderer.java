@@ -13,7 +13,6 @@ import org.lwjgl.util.vector.Vector3f;
 
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
-import terrain.Terrain;
 import toolbox.Maths;
 import entities.Camera;
 import entities.Light;
@@ -29,9 +28,9 @@ public class WaterRenderer {
 	private float moveFactor = 0;
 	private RawModel quad;
 	private WaterShader shader;
-	private WaterFrameBuffers fbos;
+	private WaterFrameBuffer fbos;
 
-	public WaterRenderer(Loader loader, WaterShader shader, Matrix4f projectionMatrix, WaterFrameBuffers fbos) {
+	public WaterRenderer(Loader loader, WaterShader shader, Matrix4f projectionMatrix, WaterFrameBuffer fbos) {
 		this.shader = shader;
 		this.fbos = fbos;
 		dudvTexture = loader.loadTexture(DUDV_MAP);

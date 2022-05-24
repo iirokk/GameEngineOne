@@ -22,6 +22,8 @@ import org.lwjgl.util.vector.Vector4f;
 import particles.ParticleMaster;
 import particles.ParticleSystem;
 import particles.ParticleTexture;
+import postProcessing.FrameBuffer;
+import postProcessing.PostProcessing;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -30,7 +32,7 @@ import terrain.TerrainMap;
 import textures.ModelTexture;
 import toolbox.MousePicker;
 import toolbox.MouseSelector;
-import water.WaterFrameBuffers;
+import water.WaterFrameBuffer;
 import water.WaterRenderer;
 import water.WaterShader;
 import water.WaterTile;
@@ -62,7 +64,7 @@ public class MainGameLoop {
 
         // Water
         List<WaterTile> waterTiles = terrainMap.getWaterTiles();
-        WaterFrameBuffers frameBuffers = new WaterFrameBuffers();
+        WaterFrameBuffer frameBuffers = new WaterFrameBuffer();
         WaterShader waterShader = new WaterShader();
 
         // creating entities list
@@ -161,6 +163,12 @@ public class MainGameLoop {
         MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
         MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
 
+        // FBO: frame buffer object
+        FrameBuffer multisampleFrameBuffer = new FrameBuffer(Display.getWidth(), Display.getHeight());
+        FrameBuffer outputFrameBuffer = new FrameBuffer(Display.getWidth(), Display.getHeight(), FrameBuffer.DEPTH_TEXTURE);
+        PostProcessing.init(loader);
+
+
         while (!Display.isCloseRequested()) {
             camera.move();
             playerPosition.move(terrainMap);
@@ -195,11 +203,14 @@ public class MainGameLoop {
             GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
             frameBuffers.unbindCurrentFrameBuffer();
 
+            // Render to frame buffer for post processing
+            multisampleFrameBuffer.bindFrameBuffer();
             renderer.renderScene(entities, terrainMap, lightSources, camera, new Vector4f(0, 0, 0, 0));
             waterRenderer.render(waterTiles, camera, lightSources.get(0));
-
-            // render particles
             ParticleMaster.renderParticles(camera);
+            multisampleFrameBuffer.unbindFrameBuffer();
+            multisampleFrameBuffer.resolveToFrameBuffer(outputFrameBuffer);
+            PostProcessing.doPostProcessing(outputFrameBuffer.getColourTexture());
 
             // Render GUI & texts
             guiRenderer.render(guiTextures);
@@ -210,6 +221,9 @@ public class MainGameLoop {
             DisplayManager.updateDisplay();
         }
         // Clean up
+        multisampleFrameBuffer.cleanUp();
+        outputFrameBuffer.cleanUp();
+        PostProcessing.cleanUp();
         ParticleMaster.cleanUp();
         TextMaster.cleanUp();
         frameBuffers.cleanUp();

@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 
-public class WaterFrameBuffers {
+public class WaterFrameBuffer {
 
     protected static final int REFLECTION_WIDTH = 320;
     private static final int REFLECTION_HEIGHT = 180;
@@ -23,7 +23,7 @@ public class WaterFrameBuffers {
     private int refractionTexture;
     private int refractionDepthTexture;
 
-    public WaterFrameBuffers() {  //call when loading the game
+    public WaterFrameBuffer() {  //call when loading the game
         initialiseReflectionFrameBuffer();
         initialiseRefractionFrameBuffer();
     }
