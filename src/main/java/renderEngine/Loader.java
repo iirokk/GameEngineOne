@@ -17,7 +17,8 @@ import org.newdawn.slick.opengl.TextureLoader;
 import textures.TextureData;
 
 public class Loader {
-	
+
+	private final float ANISOTROPIC_FILTERING_AMOUNT = 4;
 	private List<Integer> vaos = new ArrayList<>();
 	private List<Integer> vbos = new ArrayList<>();
 	private List<Integer> textures = new ArrayList<>();
@@ -95,7 +96,14 @@ public class Loader {
 			// mip mapping
 			GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, -0.5f); // more negative for more distance detail
+			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, 0);
+			if (GLContext.getCapabilities().GL_EXT_texture_filter_anisotropic) {
+				float anisotropicFilteringLevel = Math.min(ANISOTROPIC_FILTERING_AMOUNT,
+						GL11.glGetFloat(EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT));
+				GL11.glTexParameterf(GL11.GL_TEXTURE_2D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropicFilteringLevel);
+			} else {
+				System.out.println("Anisotropic filtering disabled.");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

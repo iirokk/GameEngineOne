@@ -235,8 +235,6 @@ public class Terrain {
         gravel = gravel < 0 ? 0 : gravel;
         sand = sand < 0 ? 0 : sand;
         rock = rock < 0 ? 0 : rock;
-
-
         float sum = grass + gravel + sand + rock;
 
         // texture 1 (gravel)

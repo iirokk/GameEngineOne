@@ -22,12 +22,27 @@ uniform float shineDamper;
 uniform float reflectivity;
 uniform vec3 skyColor;
 
+const int shadowFilterSize = 2;
+const float totalShadowFilterPixels = (shadowFilterSize * 2.0 + 1.0) * (shadowFilterSize * 2.0 + 1.0);
+
 void main(void){
-    float objectNearestLight = texture(shadowMap, shadowCoords.xy).r;
-    float lightFactor = 1.0;
-    if (shadowCoords.z > objectNearestLight) {
-        lightFactor = 1.0 - (shadowCoords.w * 0.4);
+
+    // Shadow Percentage closer filtering
+    float shadowMapSize = 2048.0;  // make this uniform, update from code
+    float shadowFilterPixelSize = 1.0 / shadowMapSize;
+    float shadowTotal = 0.0;
+
+    for(int x = -shadowFilterSize; x<=shadowFilterSize; x++) {
+        for(int y = -shadowFilterSize; y<=shadowFilterSize; y++) {
+            float objectNearestLight = texture(shadowMap, shadowCoords.xy + vec2(x, y) * shadowFilterPixelSize).r;
+            if (shadowCoords.z > objectNearestLight + 0.001) {
+                shadowTotal += 1.0;
+            }
+        }
     }
+
+    shadowTotal /= totalShadowFilterPixels;
+    float lightFactor = 1.0 - (shadowTotal * shadowCoords.w);
 
     // texture blending
     float backTextureAmount = 1 - (pass_textureBlendColor.r + pass_textureBlendColor.g + pass_textureBlendColor.b);
