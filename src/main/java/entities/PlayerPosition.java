@@ -9,10 +9,11 @@ import terrain.TerrainMap;
 
 public class PlayerPosition extends PositionalObject {
 
-    private static final float MOVEMENT_SPEED = 50;
+    private static final float MINIMUM_MOVEMENT_SPEED = 50;
     private static final float TURN_SPEED = 180;
     private static final float JUMP_POWER = 40;
 
+    private float movementSpeed = 0;
     private float currentForwardSpeed = 0;
     private float currentSidewaysSpeed = 0;
     private float currentTurnSpeed = 0;
@@ -31,7 +32,7 @@ public class PlayerPosition extends PositionalObject {
         super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
 
         // counter the addition of x and y speed
-        if (Math.abs(currentForwardSpeed) + Math.abs(currentSidewaysSpeed) > MOVEMENT_SPEED) {
+        if (Math.abs(currentForwardSpeed) + Math.abs(currentSidewaysSpeed) > movementSpeed) {
             currentForwardSpeed /= Math.sqrt(2);
             currentSidewaysSpeed /= Math.sqrt(2);
         }
@@ -52,6 +53,10 @@ public class PlayerPosition extends PositionalObject {
         }
     }
 
+    public void setMovementSpeed(float movementSpeed) {
+        this.movementSpeed = MINIMUM_MOVEMENT_SPEED + movementSpeed;
+    }
+
     private void jump() {
         if (!isInAir) {
             this.upwardSpeed = JUMP_POWER;
@@ -61,16 +66,16 @@ public class PlayerPosition extends PositionalObject {
 
     private void checkInputs() {
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-            this.currentForwardSpeed = MOVEMENT_SPEED;
+            this.currentForwardSpeed = movementSpeed;
         } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-            this.currentForwardSpeed = -MOVEMENT_SPEED;
+            this.currentForwardSpeed = -movementSpeed;
         } else {
             this.currentForwardSpeed = 0;
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-            this.currentSidewaysSpeed = MOVEMENT_SPEED;
+            this.currentSidewaysSpeed = movementSpeed;
         } else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-            this.currentSidewaysSpeed = -MOVEMENT_SPEED;
+            this.currentSidewaysSpeed = -movementSpeed;
         } else {
             this.currentSidewaysSpeed = 0;
         }

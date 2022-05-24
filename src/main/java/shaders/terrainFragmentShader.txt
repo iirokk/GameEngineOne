@@ -6,6 +6,7 @@ in vec3 toLightVector[4]; // int max light sources affecting the entity
 in vec3 toCameraVector;
 in float visibility;
 in vec4 shadowCoords;
+in vec3 pass_textureBlendColor;
 
 out vec4 out_Color;
 
@@ -13,7 +14,6 @@ uniform sampler2D backgroundTexture;
 uniform sampler2D rTexture;
 uniform sampler2D gTexture;
 uniform sampler2D bTexture;
-uniform sampler2D blendMap;
 uniform sampler2D shadowMap;
 
 uniform vec3 lightColor[4];
@@ -30,13 +30,12 @@ void main(void){
     }
 
     // texture blending
-    vec4 blendMapColor = texture(blendMap, pass_textureCoords);
-    float backTextureAmount = 1 - (blendMapColor.r + blendMapColor.g + blendMapColor.b);
+    float backTextureAmount = 1 - (pass_textureBlendColor.r + pass_textureBlendColor.g + pass_textureBlendColor.b);
     vec2 tiledCoords = pass_textureCoords * 40.0;
     vec4 backgroundTextureColor = texture(backgroundTexture, tiledCoords) * backTextureAmount;
-    vec4 rTextureColor = texture(rTexture, tiledCoords) * blendMapColor.r;
-    vec4 gTextureColor = texture(gTexture, tiledCoords) * blendMapColor.g;
-    vec4 bTextureColor = texture(bTexture, tiledCoords) * blendMapColor.b;
+    vec4 rTextureColor = texture(rTexture, tiledCoords) * pass_textureBlendColor.r;
+    vec4 gTextureColor = texture(gTexture, tiledCoords) * pass_textureBlendColor.g;
+    vec4 bTextureColor = texture(bTexture, tiledCoords) * pass_textureBlendColor.b;
 
     vec4 totalColor = backgroundTextureColor + rTextureColor + gTextureColor + bTextureColor;
 
@@ -62,7 +61,7 @@ void main(void){
         totalSpecular = totalSpecular + (dampedFactor * reflectivity * lightColor[i]) / attenuationFactor;
     }
 
-    totalDiffuse = max(totalDiffuse * lightFactor, 0.3) ; // ambient light value
+    totalDiffuse = max(totalDiffuse * lightFactor, 0.5) ; // ambient light value
 
     out_Color = vec4(totalDiffuse, 1.0) * totalColor + vec4 (totalSpecular, 1.0);
     out_Color = mix(vec4(skyColor, 1.0), out_Color, visibility);

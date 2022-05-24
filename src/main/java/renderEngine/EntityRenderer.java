@@ -1,7 +1,6 @@
 package renderEngine;
 
 import entities.Entity;
-import entities.Light;
 import models.RawModel;
 import models.TexturedModel;
 import org.lwjgl.opengl.*;
@@ -10,7 +9,6 @@ import shaders.StaticShader;
 import textures.ModelTexture;
 import toolbox.Maths;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +28,7 @@ public class EntityRenderer {
 			prepareTexturedModel(model);
 			List<Entity> batch = entities.get(model);
 			for(Entity entity:batch) {
-				prepareIntance(entity);
+				prepareInstance(entity);
 				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(),
 						GL11.GL_UNSIGNED_INT, 0);
 			}
@@ -52,10 +50,10 @@ public class EntityRenderer {
 		shader.loadFakeLightingVariable(texture.isUseFakeLighting());
 		shader.loadShineVariables(texture.getShineDamper(), texture.getReflectivity());
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturedModel.getTexture().getID());
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturedModel.getTexture().getTextureID());
 	}
 
-	private void prepareIntance(Entity entity) {
+	private void prepareInstance(Entity entity) {
 		Matrix4f transformationMatrix = Maths.createTransformationMatrix(entity.getPosition(),
 				entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
 		shader.loadTransformationMatrix(transformationMatrix);

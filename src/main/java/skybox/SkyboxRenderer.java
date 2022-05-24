@@ -8,10 +8,13 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import renderEngine.Loader;
+import renderEngine.MasterRenderer;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class SkyboxRenderer {
 
-    private static final float SIZE = 550f;  // max 1/3^(1/2) * FAR_PLANE from MasterRenderer class
+    private static final float SIZE = MasterRenderer.FAR_PLANE * 0.577f;  // max 1/3^(1/2) * FAR_PLANE from MasterRenderer class
 
     private static final float[] VERTICES = {
             -SIZE,  SIZE, -SIZE,
@@ -75,25 +78,26 @@ public class SkyboxRenderer {
         shader.stop();
     }
 
-    public void render(Camera camera, float rFog, float gFog, float bFog, float blendFactor) {
+    public void render(Camera camera, float rFog, float gFog, float bFog) {
         shader.start();
         shader.loadViewMatrix(camera);
         shader.loadFogColor(rFog, gFog, bFog);
+        glDisable(GL_DEPTH_TEST);
         GL30.glBindVertexArray(cube.getVaoID());
         GL20.glEnableVertexAttribArray(0);
-        bindTextures(blendFactor);
+        bindTextures();
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, cube.getVertexCount());
         GL20.glDisableVertexAttribArray(0);
         GL30.glBindVertexArray(0);
+        glEnable(GL_DEPTH_TEST);
         shader.stop();
     }
 
-    public void bindTextures(float blendFactor) {
+    public void bindTextures() {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, texture);
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, nightTexture);
-        shader.loadBlendFactor(blendFactor);
     }
 
     public void cleanUp() {

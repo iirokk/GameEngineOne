@@ -58,7 +58,7 @@ public class MainGameLoop {
 
         // Terrain
         TerrainLoader terrainLoader = new TerrainLoader(loader);
-        TerrainMap terrainMap = terrainLoader.generateTerrainMap();
+        TerrainMap terrainMap = terrainLoader.createTerrainFromHeightmap("hmap_river");
 
         // Water
         List<WaterTile> waterTiles = terrainMap.getWaterTiles();
@@ -80,11 +80,11 @@ public class MainGameLoop {
         texture1.setHasTransparency(true);
         texture1.setNumberOfRows(2);
 
-        ModelData modelData2 = OBJFileLoader.loadOBJ("gameModels/dead_tree");
+        ModelData modelData2 = OBJFileLoader.loadOBJ("gameModels/house1");
         RawModel model2 = loader.loadToVAO(modelData2.getVertices(), modelData2.getTextureCoords(), modelData2.getNormals(),
                 modelData2.getIndices());
         TexturedModel texturedModel2 = new TexturedModel(model2,
-                new ModelTexture(loader.loadTexture("ground_tex")));
+                new ModelTexture(loader.loadTexture("texture/stone")));
         ModelTexture texture2 = texturedModel2.getTexture();
         texture2.setShineDamper(5);
         texture2.setReflectivity(0.1f);
@@ -113,8 +113,9 @@ public class MainGameLoop {
 
         // Light
         List<Light> lightSources = new ArrayList<>();
-        Vector3f sunOriginalColor = new Vector3f(1.2f, 1.2f, 1.2f);
-        Light sun = new Light(new Vector3f(0, 10, 0), sunOriginalColor);
+        float sunBrightness = 1.5f;
+        Vector3f sunOriginalColor = new Vector3f(1f * sunBrightness, 0.97f * sunBrightness, 0.91f * sunBrightness);
+        Light sun = new Light(new Vector3f(-10000f, 10000f, 10000f), sunOriginalColor);
         lightSources.add(sun);
         Light campFire = new Light(new Vector3f(5, 10, 0), new Vector3f(2.6f, 2.0f, 1.3f),
                 new Vector3f(1, 0.001f, 0.001f));
@@ -160,16 +161,7 @@ public class MainGameLoop {
         MousePicker mousePicker = new MousePicker(renderer.getProjectionMatrix(), camera);
         MouseSelector mouseSelector = new MouseSelector(mousePicker, camera);
 
-        float timeOfDay = 12.60f;
         while (!Display.isCloseRequested()) {
-            timeOfDay += DisplayManager.getFrameTimeSeconds() / 100f;
-            timeOfDay %= 24;
-            float dayNightBlendFactor = calculateDayNightBlendFactor(timeOfDay);
-            // set lower sun brightness during night
-            sun.setColor(calculateSunColor(dayNightBlendFactor, sunOriginalColor));
-            // set sun position during the day
-            sun.setPosition(calculateSunPosition(timeOfDay));
-
             camera.move();
             playerPosition.move(terrainMap);
             terrainMap.updateRenderedTerrains(playerPosition.getPosition().x, playerPosition.getPosition().z);
@@ -189,24 +181,21 @@ public class MainGameLoop {
             // render reflection
             GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
             frameBuffers.bindReflectionFrameBuffer();
-            float cameraReflectionDistance = 2 * (camera.getPosition().y - waterTiles.get(0).getHeight());
+            float cameraReflectionDistance = 2 * (camera.getPosition().y - TerrainMap.WATER_LEVEL);
             camera.getPosition().y -= cameraReflectionDistance;
             camera.invertPitch();
-            renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
-                    new Vector4f(0, 1, 0, -waterTiles.get(0).getHeight()));
+            renderer.renderScene(entities, terrainMap, lightSources, camera, new Vector4f(0, 1, 0, -TerrainMap.WATER_LEVEL));
             camera.getPosition().y += cameraReflectionDistance;
             camera.invertPitch();
 
             // render refraction
             frameBuffers.bindRefractionFrameBuffer();
-            renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
-                    new Vector4f(0, -1, 0, waterTiles.get(0).getHeight() + 1f));
+            renderer.renderScene(entities, terrainMap, lightSources, camera, new Vector4f(0, -1, 0, TerrainMap.WATER_LEVEL + 1f));
             // raise clipping plane level to reduce glitching at water edge (try removing later)
             GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
             frameBuffers.unbindCurrentFrameBuffer();
 
-            renderer.renderScene(entities, terrainMap, lightSources, camera, dayNightBlendFactor,
-                    new Vector4f(0, 0, 0, 0));
+            renderer.renderScene(entities, terrainMap, lightSources, camera, new Vector4f(0, 0, 0, 0));
             waterRenderer.render(waterTiles, camera, lightSources.get(0));
 
             // render particles
@@ -215,7 +204,7 @@ public class MainGameLoop {
             // Render GUI & texts
             guiRenderer.render(guiTextures);
             TextMaster.updateTextString(textFPS, "FPS: " + Math.round(1 / DisplayManager.getFrameTimeSeconds()));
-            TextMaster.updateTextString(debugText, "xyz: " + camera.getPosition());
+            TextMaster.updateTextString(debugText, "xyz: " + playerPosition.getPosition());
             TextMaster.render();
 
             DisplayManager.updateDisplay();
@@ -229,44 +218,5 @@ public class MainGameLoop {
         renderer.cleanUp();
         loader.cleanUp();
         DisplayManager.closeDisplay();
-    }
-
-    private static float calculateDayNightBlendFactor(float timeOfDay) {
-        if (timeOfDay < 2 || timeOfDay > 22) {
-            return 1f;  // full night
-        } else if (timeOfDay > 5 && timeOfDay < 18) {
-            return 0f; // full day
-        } else if (timeOfDay >= 2 && timeOfDay <= 5) {
-            return 1 - (timeOfDay - 2) / 3; // morning
-        } else if (timeOfDay >= 19 && timeOfDay <= 22) {
-            return (timeOfDay - 19) / 3; // evening
-        } else {
-            return 0f;
-        }
-    }
-
-    private static Vector3f calculateSunPosition(float timeOfDay) {
-        // y upward, x east-west, z north-south
-        float dayFraction = (timeOfDay - 12) / 12;
-        float yPosition = (float) (Math.cos(Math.PI * dayFraction) + 1) / 2 * 1500000;
-        float zPosition = (float) -(Math.cos(Math.PI * dayFraction) + 0.5) / 2 * 2000000;
-        float xPosition = (float) (Math.cos(Math.PI * dayFraction)) / 16 * 2000000;
-
-        Vector3f newPosition = new Vector3f();
-        newPosition.x = xPosition;
-        newPosition.y = yPosition;
-        newPosition.z = zPosition;
-        return newPosition;
-    }
-
-    private static Vector3f calculateSunColor(float nightBlendFactor, Vector3f sunColor) {
-        Vector3f shadingVector = new Vector3f(1 + nightBlendFactor, 1 + 0.35f * nightBlendFactor, 1);
-        shadingVector.scale(1 - nightBlendFactor);
-
-        Vector3f finalColor = new Vector3f();
-        finalColor.x = sunColor.x * shadingVector.x;
-        finalColor.y = sunColor.y * shadingVector.y;
-        finalColor.z = sunColor.z * shadingVector.z;
-        return finalColor;
     }
 }
