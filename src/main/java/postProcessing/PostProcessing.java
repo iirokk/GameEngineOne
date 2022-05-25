@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL30;
 import postProcessing.contrast.ContrastEffect;
 import postProcessing.gaussianBlur.HorizontalBlur;
 import postProcessing.gaussianBlur.VerticalBlur;
+import postProcessing.saturation.SaturationEffect;
 import renderEngine.Loader;
 
 import java.util.HashMap;
@@ -33,6 +34,8 @@ public class PostProcessing {
                 new HorizontalBlur(Display.getWidth() / 2, Display.getHeight() / 2));
         postProcessingEffects.put("gaussianBlurV1",
                 new VerticalBlur(Display.getWidth() / 2, Display.getHeight() / 2));
+        postProcessingEffects.put("saturation",
+                new SaturationEffect(Display.getWidth(), Display.getHeight()));
         postProcessingEffects.put("contrast", new ContrastEffect());
     }
 
@@ -53,7 +56,9 @@ public class PostProcessing {
             outputTexture = colourTexture;
         }
 
-        postProcessingEffects.get("contrast").render(outputTexture);
+        PostProcessingEffect saturation = postProcessingEffects.get("saturation");
+        saturation.render(outputTexture);
+        postProcessingEffects.get("contrast").render(saturation.getOutputTexture());
         end();
     }
 
